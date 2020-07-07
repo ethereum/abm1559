@@ -1,0 +1,6 @@
+.DS_Store
+__py_cache__
+*.egg-info
+build
+Pipfile
+Pipfile.lock
