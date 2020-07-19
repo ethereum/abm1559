@@ -14,9 +14,10 @@ tx = {
 async def run():
     nc = NATS()
 
-    await nc.connect(servers = ["demo.nats.io:4222"])
+    await nc.connect(servers = ["nats://3.22.223.170:4222"])
 
-    await nc.publish("txs", json.dumps(tx).encode())
+    for i in range(100):
+        await nc.publish("txs", json.dumps(tx).encode())
 
     # Terminate connection to NATS.
     await nc.close()
