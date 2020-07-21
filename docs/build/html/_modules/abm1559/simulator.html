@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>abm1559.simulator &#8212; abm1559 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">abm1559 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">abm1559.simulator</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for abm1559.simulator</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">from</span> <span class="nn">abm1559.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">rng</span><span class="p">,</span>
+    <span class="n">constants</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">abm1559.txs</span> <span class="kn">import</span> <span class="n">Transaction</span>
+<span class="kn">from</span> <span class="nn">abm1559.chain</span> <span class="kn">import</span> <span class="n">Block</span>
+<span class="kn">from</span> <span class="nn">abm1559.users</span> <span class="kn">import</span> <span class="n">User</span><span class="p">,</span> <span class="n">User1559</span>
+
+<div class="viewcode-block" id="spawn_poisson_demand"><a class="viewcode-back" href="../../index.html#abm1559.simulator.spawn_poisson_demand">[docs]</a><span class="k">def</span> <span class="nf">spawn_poisson_demand</span><span class="p">(</span><span class="n">timestep</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">demand_lambda</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">User1559</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Args:</span>
+<span class="sd">        timestep (int): Current round</span>
+<span class="sd">        demand_lambda (float): Rate of arrival, the :math:`lambda` parameter of a Poisson distribution</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Sequence[User1559]: An array of 1559 users</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">real</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">demand_lambda</span><span class="p">)</span>
+    <span class="n">new_users</span> <span class="o">=</span> <span class="p">[</span><span class="n">User1559</span><span class="p">(</span><span class="n">timestep</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">real</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">new_users</span></div>
+
+<div class="viewcode-block" id="decide_transactions"><a class="viewcode-back" href="../../index.html#abm1559.simulator.decide_transactions">[docs]</a><span class="k">def</span> <span class="nf">decide_transactions</span><span class="p">(</span><span class="n">demand</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">User</span><span class="p">],</span> <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Transaction</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Queries all users and checks who wants to send transactions and who wants to balk.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        demand (Sequence[User]): Current demand</span>
+<span class="sd">        params (Dict): Current simulation environment parameters (e.g., basefee)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Sequence[Transaction]: An array of transactions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">txs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">basefee</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;basefee&quot;</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">demand</span><span class="p">:</span>
+        <span class="n">tx</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">transact</span><span class="p">({</span>
+            <span class="s2">&quot;basefee&quot;</span><span class="p">:</span> <span class="n">basefee</span>
+        <span class="p">})</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">tx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">txs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tx</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">txs</span></div>
+
+<div class="viewcode-block" id="update_basefee"><a class="viewcode-back" href="../../index.html#abm1559.simulator.update_basefee">[docs]</a><span class="k">def</span> <span class="nf">update_basefee</span><span class="p">(</span><span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">,</span> <span class="n">basefee</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Basefee update rule</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        block (Block): The previous block</span>
+<span class="sd">        basefee (int): The current basefee</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: The new basefee</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">gas_used</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">tx</span><span class="o">.</span><span class="n">gas_used</span> <span class="k">for</span> <span class="n">tx</span> <span class="ow">in</span> <span class="n">block</span><span class="o">.</span><span class="n">txs</span><span class="p">])</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">gas_used</span> <span class="o">-</span> <span class="n">constants</span><span class="p">[</span><span class="s2">&quot;TARGET_GAS_USED&quot;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">basefee</span> <span class="o">+</span> <span class="n">basefee</span> <span class="o">*</span> <span class="n">delta</span> <span class="o">//</span> <span class="n">constants</span><span class="p">[</span><span class="s2">&quot;TARGET_GAS_USED&quot;</span><span class="p">]</span> <span class="o">//</span> <span class="n">constants</span><span class="p">[</span><span class="s2">&quot;BASEFEE_MAX_CHANGE_DENOMINATOR&quot;</span><span class="p">]</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">abm1559 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">abm1559.simulator</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Barnabé Monnot.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

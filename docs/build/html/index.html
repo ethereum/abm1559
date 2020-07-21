@@ -1,0 +1,291 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to abm1559’s documentation! &#8212; abm1559 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">abm1559 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Welcome to abm1559’s documentation!</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="welcome-to-abm1559-s-documentation">
+<h1>Welcome to abm1559’s documentation!<a class="headerlink" href="#welcome-to-abm1559-s-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="module-abm1559.txs">
+<span id="txs"></span><h2>txs<a class="headerlink" href="#module-abm1559.txs" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="abm1559.txs.Transaction">
+<em class="property">class </em><code class="sig-prename descclassname">abm1559.txs.</code><code class="sig-name descname">Transaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sender</span></em>, <em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">gas_used</span><span class="o">=</span><span class="default_value">21000</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abm1559/txs.html#Transaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abm1559.txs.Transaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>An abstract superclass for transactions.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="abm1559.txs.Tx1559">
+<em class="property">class </em><code class="sig-prename descclassname">abm1559.txs.</code><code class="sig-name descname">Tx1559</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sender</span></em>, <em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">gas_used</span><span class="o">=</span><span class="default_value">21000</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abm1559/txs.html#Tx1559"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abm1559.txs.Tx1559" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inherits from <a class="reference internal" href="#abm1559.txs.Transaction" title="abm1559.txs.Transaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">abm1559.txs.Transaction</span></code></a>. A 1559-type transaction.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="abm1559.txs.TxEscalator">
+<em class="property">class </em><code class="sig-prename descclassname">abm1559.txs.</code><code class="sig-name descname">TxEscalator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sender</span></em>, <em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">gas_used</span><span class="o">=</span><span class="default_value">21000</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abm1559/txs.html#TxEscalator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abm1559.txs.TxEscalator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inherits from <a class="reference internal" href="#abm1559.txs.Transaction" title="abm1559.txs.Transaction"><code class="xref py py-class docutils literal notranslate"><span class="pre">abm1559.txs.Transaction</span></code></a>. An escalator-type transaction.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-abm1559.chain">
+<span id="chain"></span><h2>chain<a class="headerlink" href="#module-abm1559.chain" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="abm1559.chain.Block">
+<em class="property">class </em><code class="sig-prename descclassname">abm1559.chain.</code><code class="sig-name descname">Block</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">txs</span></em>, <em class="sig-param"><span class="n">parent_hash</span></em>, <em class="sig-param"><span class="n">height</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abm1559/chain.html#Block"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abm1559.chain.Block" title="Permalink to this definition">¶</a></dt>
+<dd><p>An abstract block representation.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="abm1559.chain.Block1559">
+<em class="property">class </em><code class="sig-prename descclassname">abm1559.chain.</code><code class="sig-name descname">Block1559</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">txs</span></em>, <em class="sig-param"><span class="n">parent_hash</span></em>, <em class="sig-param"><span class="n">height</span></em>, <em class="sig-param"><span class="n">basefee</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abm1559/chain.html#Block1559"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abm1559.chain.Block1559" title="Permalink to this definition">¶</a></dt>
+<dd><p>Blocks filled up with 1559 transactions (see <code class="xref py py-class docutils literal notranslate"><span class="pre">abm1559.chain.Tx1559</span></code>).</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="abm1559.chain.Chain">
+<em class="property">class </em><code class="sig-prename descclassname">abm1559.chain.</code><code class="sig-name descname">Chain</code><a class="reference internal" href="_modules/abm1559/chain.html#Chain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abm1559.chain.Chain" title="Permalink to this definition">¶</a></dt>
+<dd><p>A container for <a class="reference internal" href="#abm1559.chain.Block" title="abm1559.chain.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">abm1559.chain.Block</span></code></a> .</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-abm1559.txpool">
+<span id="txpool"></span><h2>txpool<a class="headerlink" href="#module-abm1559.txpool" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="abm1559.txpool.TxPool">
+<em class="property">class </em><code class="sig-prename descclassname">abm1559.txpool.</code><code class="sig-name descname">TxPool</code><a class="reference internal" href="_modules/abm1559/txpool.html#TxPool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abm1559.txpool.TxPool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents the transaction queue.</p>
+<dl class="py method">
+<dt id="abm1559.txpool.TxPool.add_txs">
+<code class="sig-name descname">add_txs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">txs</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span><a class="reference internal" href="#abm1559.txs.Transaction" title="abm1559.txs.Transaction">abm1559.txs.Transaction</a><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/abm1559/txpool.html#TxPool.add_txs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abm1559.txpool.TxPool.add_txs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds <cite>txs</cite> to the queue.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>txs</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="#abm1559.txs.Transaction" title="abm1559.txs.Transaction"><em>Transaction</em></a><em>]</em>) – The transactions to add</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="abm1559.txpool.TxPool.remove_txs">
+<code class="sig-name descname">remove_txs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tx_hashes</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>str<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abm1559/txpool.html#TxPool.remove_txs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abm1559.txpool.TxPool.remove_txs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes transactions from the queue, indexed by <cite>tx_hashes</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>txs</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="#abm1559.txs.Transaction" title="abm1559.txs.Transaction"><em>Transaction</em></a><em>]</em>) – The transactions to add</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="users">
+<h2>users<a class="headerlink" href="#users" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="abm1559.users.User">
+<em class="property">class </em><code class="sig-prename descclassname">abm1559.users.</code><code class="sig-name descname">User</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">wakeup_block</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abm1559/users.html#User"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abm1559.users.User" title="Permalink to this definition">¶</a></dt>
+<dd><p>Users submit transactions. They have a (randomly chosen) value per Gwei $v$, (we choose per Gwei such that all evaluations of their welfare can be done independently of how much gas the transaction uses).</p>
+<p>The user evaluates the total cost of the transaction in one of two ways, embodied by two different subclasses:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#abm1559.users.AffineUser" title="abm1559.users.AffineUser"><code class="xref py py-class docutils literal notranslate"><span class="pre">abm1559.users.AffineUser</span></code></a>: Incurs a fixed (but randomly selected) cost <span class="math notranslate nohighlight">\(c\)</span> per unit of time (block-to-block), so <span class="math notranslate nohighlight">\(cost(t) = v - c * t\)</span>.</p></li>
+<li><p><a class="reference internal" href="#abm1559.users.DiscountUser" title="abm1559.users.DiscountUser"><code class="xref py py-class docutils literal notranslate"><span class="pre">abm1559.users.DiscountUser</span></code></a>: Incurs a discount <span class="math notranslate nohighlight">\(\delta\)</span> over time, so <span class="math notranslate nohighlight">\(cost(t) = v * (1 - \delta)^t\)</span>.</p></li>
+</ul>
+<p><cite>AffineUser</cite> or <cite>DiscountUser</cite> are subclassed to create users who send different types of transactions, e.g., 1559-type transactions, escalators or something different. The subclasses should implement:</p>
+<ul class="simple">
+<li><p>(Optional) <cite>expected_time(params)</cite>: How the user estimates how long they will wait for their transaction to be included.</p></li>
+<li><p>(Optional) <cite>decide_parameters(params)</cite>: Based on their type and <cite>params</cite> (typically, current basefee, length of the queue or salient statistics e.g., distribution of tips in the queue), return transaction parameters.</p></li>
+<li><p>(Requested) <cite>transact(params)</cite>: Queried by the simulation when user is spawned. Returns either a transaction or <cite>None</cite> if they balk.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py class">
+<dt id="abm1559.users.AffineUser">
+<em class="property">class </em><code class="sig-prename descclassname">abm1559.users.</code><code class="sig-name descname">AffineUser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">wakeup_block</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abm1559/users.html#AffineUser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abm1559.users.AffineUser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Affine users incur a fixed cost per unit of time.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="abm1559.users.DiscountUser">
+<em class="property">class </em><code class="sig-prename descclassname">abm1559.users.</code><code class="sig-name descname">DiscountUser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">wakeup_block</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abm1559/users.html#DiscountUser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abm1559.users.DiscountUser" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of discount users is reduced over time.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="abm1559.users.User1559">
+<em class="property">class </em><code class="sig-prename descclassname">abm1559.users.</code><code class="sig-name descname">User1559</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">wakeup_block</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abm1559/users.html#User1559"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abm1559.users.User1559" title="Permalink to this definition">¶</a></dt>
+<dd><p>An affine user sending 1559 transactions.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-abm1559.simulator">
+<span id="simulator"></span><h2>simulator<a class="headerlink" href="#module-abm1559.simulator" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="abm1559.simulator.decide_transactions">
+<code class="sig-prename descclassname">abm1559.simulator.</code><code class="sig-name descname">decide_transactions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">demand</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span><a class="reference internal" href="#abm1559.users.User" title="abm1559.users.User">abm1559.users.User</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">params</span><span class="p">:</span> <span class="n">Dict</span></em><span class="sig-paren">)</span> &#x2192; Sequence<span class="p">[</span><a class="reference internal" href="#abm1559.txs.Transaction" title="abm1559.txs.Transaction">abm1559.txs.Transaction</a><span class="p">]</span><a class="reference internal" href="_modules/abm1559/simulator.html#decide_transactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abm1559.simulator.decide_transactions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries all users and checks who wants to send transactions and who wants to balk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>demand</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="#abm1559.users.User" title="abm1559.users.User"><em>User</em></a><em>]</em>) – Current demand</p></li>
+<li><p><strong>params</strong> (<em>Dict</em>) – Current simulation environment parameters (e.g., basefee)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An array of transactions</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Sequence[<a class="reference internal" href="#abm1559.txs.Transaction" title="abm1559.txs.Transaction">Transaction</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="abm1559.simulator.spawn_poisson_demand">
+<code class="sig-prename descclassname">abm1559.simulator.</code><code class="sig-name descname">spawn_poisson_demand</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timestep</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">demand_lambda</span><span class="p">:</span> <span class="n">float</span></em><span class="sig-paren">)</span> &#x2192; Sequence<span class="p">[</span><a class="reference internal" href="#abm1559.users.User1559" title="abm1559.users.User1559">abm1559.users.User1559</a><span class="p">]</span><a class="reference internal" href="_modules/abm1559/simulator.html#spawn_poisson_demand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abm1559.simulator.spawn_poisson_demand" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timestep</strong> (<em>int</em>) – Current round</p></li>
+<li><p><strong>demand_lambda</strong> (<em>float</em>) – Rate of arrival, the <span class="math notranslate nohighlight">\(lambda\)</span> parameter of a Poisson distribution</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An array of 1559 users</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Sequence[<a class="reference internal" href="#abm1559.users.User1559" title="abm1559.users.User1559">User1559</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="abm1559.simulator.update_basefee">
+<code class="sig-prename descclassname">abm1559.simulator.</code><code class="sig-name descname">update_basefee</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">block</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#abm1559.chain.Block" title="abm1559.chain.Block">abm1559.chain.Block</a></span></em>, <em class="sig-param"><span class="n">basefee</span><span class="p">:</span> <span class="n">int</span></em><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="_modules/abm1559/simulator.html#update_basefee"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abm1559.simulator.update_basefee" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basefee update rule</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>block</strong> (<a class="reference internal" href="#abm1559.chain.Block" title="abm1559.chain.Block"><em>Block</em></a>) – The previous block</p></li>
+<li><p><strong>basefee</strong> (<em>int</em>) – The current basefee</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The new basefee</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to abm1559’s documentation!</a><ul>
+<li><a class="reference internal" href="#module-abm1559.txs">txs</a></li>
+<li><a class="reference internal" href="#module-abm1559.chain">chain</a></li>
+<li><a class="reference internal" href="#module-abm1559.txpool">txpool</a></li>
+<li><a class="reference internal" href="#users">users</a></li>
+<li><a class="reference internal" href="#module-abm1559.simulator">simulator</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">abm1559 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Welcome to abm1559’s documentation!</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Barnabé Monnot.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

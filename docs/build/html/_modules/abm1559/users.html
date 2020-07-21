@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>abm1559.users &#8212; abm1559 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">abm1559 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">abm1559.users</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for abm1559.users</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">abm1559.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_basefee_bounds</span><span class="p">,</span>
+    <span class="n">rng</span>
+<span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">abm1559.txs</span> <span class="kn">import</span> <span class="n">Tx1559</span>
+
+<div class="viewcode-block" id="User"><a class="viewcode-back" href="../../index.html#abm1559.users.User">[docs]</a><span class="k">class</span> <span class="nc">User</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Users submit transactions. They have a (randomly chosen) value per Gwei $v$, (we choose per Gwei such that all evaluations of their welfare can be done independently of how much gas the transaction uses).</span>
+
+<span class="sd">    The user evaluates the total cost of the transaction in one of two ways, embodied by two different subclasses:</span>
+
+<span class="sd">    - :py:class:`abm1559.users.AffineUser`: Incurs a fixed (but randomly selected) cost :math:`c` per unit of time (block-to-block), so :math:`cost(t) = v - c * t`.</span>
+<span class="sd">    - :py:class:`abm1559.users.DiscountUser`: Incurs a discount :math:`\delta` over time, so :math:`cost(t) = v * (1 - \delta)^t`.</span>
+
+<span class="sd">    `AffineUser` or `DiscountUser` are subclassed to create users who send different types of transactions, e.g., 1559-type transactions, escalators or something different. The subclasses should implement:</span>
+
+<span class="sd">    - (Optional) `expected_time(params)`: How the user estimates how long they will wait for their transaction to be included.</span>
+<span class="sd">    - (Optional) `decide_parameters(params)`: Based on their type and `params` (typically, current basefee, length of the queue or salient statistics e.g., distribution of tips in the queue), return transaction parameters.</span>
+<span class="sd">    - (Requested) `transact(params)`: Queried by the simulation when user is spawned. Returns either a transaction or `None` if they balk.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wakeup_block</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pub_key</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">bytes</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wakeup_block</span> <span class="o">=</span> <span class="n">wakeup_block</span>
+
+        <span class="c1"># Users have a value / Gwei for the transaction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="mi">9</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">payoff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="n">gas_price</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;gas_price&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cost</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">-</span> <span class="n">gas_price</span></div>
+
+<div class="viewcode-block" id="AffineUser"><a class="viewcode-back" href="../../index.html#abm1559.users.AffineUser">[docs]</a><span class="k">class</span> <span class="nc">AffineUser</span><span class="p">(</span><span class="n">User</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Affine users incur a fixed cost per unit of time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wakeup_block</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">wakeup_block</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cost_per_unit</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="mi">9</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Affine User with value </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> and cost </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cost_per_unit</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="nf">cost</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="n">current_block</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;current_block&quot;</span><span class="p">]</span>
+        <span class="n">elapsed_time</span> <span class="o">=</span> <span class="n">current_block</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">wakeup_block</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">cost_per_unit</span> <span class="o">*</span> <span class="n">elapsed_time</span></div>
+
+<div class="viewcode-block" id="DiscountUser"><a class="viewcode-back" href="../../index.html#abm1559.users.DiscountUser">[docs]</a><span class="k">class</span> <span class="nc">DiscountUser</span><span class="p">(</span><span class="n">User</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The value of discount users is reduced over time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wakeup_block</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">wakeup_block</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">discount_rate</span> <span class="o">=</span> <span class="mf">0.01</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Discount User with value </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> and discount rate </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">discount_rate</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="nf">cost</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="n">current_block</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;current_block&quot;</span><span class="p">]</span>
+        <span class="n">elapsed_time</span> <span class="o">=</span> <span class="n">current_block</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">wakeup_block</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">discount_rate</span><span class="p">)</span> <span class="o">**</span> <span class="n">elapsed_time</span></div>
+
+<div class="viewcode-block" id="User1559"><a class="viewcode-back" href="../../index.html#abm1559.users.User1559">[docs]</a><span class="k">class</span> <span class="nc">User1559</span><span class="p">(</span><span class="n">AffineUser</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An affine user sending 1559 transactions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Expects to be included within 5 blocks</span>
+    <span class="c1"># Prefers not to participate if its expected payoff is negative</span>
+    <span class="c1"># Computes expected payoff by estimating the worst possible basefee 5 blocks from now</span>
+    <span class="c1"># Fixed gas_premium</span>
+
+    <span class="k">def</span> <span class="nf">expected_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">5</span>
+
+    <span class="k">def</span> <span class="nf">decide_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">gas_premium</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="mi">9</span><span class="p">)</span>
+        <span class="c1"># max_fee = self.value - self.expected_time(params = {}) * self.cost_per_unit</span>
+        <span class="n">max_fee</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;max_fee&quot;</span><span class="p">:</span> <span class="n">max_fee</span><span class="p">,</span>
+            <span class="s2">&quot;gas_premium&quot;</span><span class="p">:</span> <span class="n">gas_premium</span><span class="p">,</span>
+            <span class="s2">&quot;start_block&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">wakeup_block</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">worst_expected_basefee</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_basefee</span><span class="p">):</span>
+        <span class="n">basefee_bounds</span> <span class="o">=</span> <span class="n">get_basefee_bounds</span><span class="p">(</span><span class="n">current_basefee</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_time</span><span class="p">(</span><span class="n">params</span> <span class="o">=</span> <span class="p">{}))</span>
+        <span class="k">return</span> <span class="n">basefee_bounds</span><span class="p">[</span><span class="s2">&quot;ub&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">transact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="n">basefee</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;basefee&quot;</span><span class="p">]</span>
+
+        <span class="n">tx_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decide_parameters</span><span class="p">()</span>
+
+        <span class="c1"># expected_gas_price = min(self.worst_expected_basefee(basefee) + tx_params[&quot;gas_premium&quot;], tx_params[&quot;max_fee&quot;])</span>
+        <span class="n">expected_gas_price</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">basefee</span> <span class="o">+</span> <span class="n">tx_params</span><span class="p">[</span><span class="s2">&quot;gas_premium&quot;</span><span class="p">],</span> <span class="n">tx_params</span><span class="p">[</span><span class="s2">&quot;max_fee&quot;</span><span class="p">])</span>
+        <span class="n">expected_block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wakeup_block</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_time</span><span class="p">(</span><span class="n">params</span> <span class="o">=</span> <span class="p">{})</span>
+        <span class="n">expected_payoff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">payoff</span><span class="p">({</span>
+            <span class="s2">&quot;gas_price&quot;</span><span class="p">:</span> <span class="n">expected_gas_price</span><span class="p">,</span>
+            <span class="s2">&quot;current_block&quot;</span><span class="p">:</span> <span class="n">expected_block</span><span class="p">,</span>
+        <span class="p">})</span>
+
+        <span class="k">if</span> <span class="n">expected_payoff</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">tx_params</span><span class="p">[</span><span class="s2">&quot;max_fee&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">tx</span> <span class="o">=</span> <span class="n">Tx1559</span><span class="p">(</span>
+            <span class="n">sender</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pub_key</span><span class="p">,</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="n">tx_params</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">tx</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">abm1559 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">abm1559.users</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Barnabé Monnot.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

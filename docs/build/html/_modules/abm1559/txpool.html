@@ -1,0 +1,160 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>abm1559.txpool &#8212; abm1559 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">abm1559 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">abm1559.txpool</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for abm1559.txpool</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span>
+
+<span class="kn">from</span> <span class="nn">abm1559.txs</span> <span class="kn">import</span> <span class="n">Transaction</span>
+
+<span class="kn">from</span> <span class="nn">abm1559.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">rng</span><span class="p">,</span>
+    <span class="n">constants</span><span class="p">,</span>
+<span class="p">)</span>
+
+<div class="viewcode-block" id="TxPool"><a class="viewcode-back" href="../../index.html#abm1559.txpool.TxPool">[docs]</a><span class="k">class</span> <span class="nc">TxPool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents the transaction queue.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">txs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pool_length</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="TxPool.add_txs"><a class="viewcode-back" href="../../index.html#abm1559.txpool.TxPool.add_txs">[docs]</a>    <span class="k">def</span> <span class="nf">add_txs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txs</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Transaction</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds `txs` to the queue.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            txs (Sequence[Transaction]): The transactions to add</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">tx</span> <span class="ow">in</span> <span class="n">txs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">txs</span><span class="p">[</span><span class="n">tx</span><span class="o">.</span><span class="n">tx_hash</span><span class="p">]</span> <span class="o">=</span> <span class="n">tx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pool_length</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">txs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TxPool.remove_txs"><a class="viewcode-back" href="../../index.html#abm1559.txpool.TxPool.remove_txs">[docs]</a>    <span class="k">def</span> <span class="nf">remove_txs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tx_hashes</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes transactions from the queue, indexed by `tx_hashes`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            txs (Sequence[Transaction]): The transactions to add</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">tx_hash</span> <span class="ow">in</span> <span class="n">tx_hashes</span><span class="p">:</span>
+            <span class="k">del</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">txs</span><span class="p">[</span><span class="n">tx_hash</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pool_length</span> <span class="o">-=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tx_hashes</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">average_tip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span> <span class="c1"># in Gwei</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool_length</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">sum</span><span class="p">([</span><span class="n">tx</span><span class="o">.</span><span class="n">tip</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="k">for</span> <span class="n">tx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">txs</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool_length</span> <span class="o">/</span> <span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="mi">9</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">average_gas_price</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool_length</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">sum</span><span class="p">([</span><span class="n">tx</span><span class="o">.</span><span class="n">gas_price</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="k">for</span> <span class="n">tx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">txs</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool_length</span> <span class="o">/</span> <span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="mi">9</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">select_transactions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="c1"># Miner side</span>
+        <span class="n">basefee</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;basefee&quot;</span><span class="p">]</span>
+        <span class="n">max_tx_in_block</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">constants</span><span class="p">[</span><span class="s2">&quot;MAX_GAS_EIP1559&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">constants</span><span class="p">[</span><span class="s2">&quot;SIMPLE_TRANSACTION_GAS&quot;</span><span class="p">])</span>
+
+        <span class="n">sorted_valid_demand</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">tx</span> <span class="k">for</span> <span class="n">tx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">txs</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">tx</span><span class="o">.</span><span class="n">is_valid</span><span class="p">({</span> <span class="s2">&quot;basefee&quot;</span><span class="p">:</span> <span class="n">basefee</span> <span class="p">})],</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">tx</span><span class="p">:</span> <span class="o">-</span><span class="n">tx</span><span class="o">.</span><span class="n">tip</span><span class="p">({</span> <span class="s2">&quot;basefee&quot;</span><span class="p">:</span> <span class="n">basefee</span> <span class="p">})</span>
+        <span class="p">)</span>
+        <span class="n">selected_txs</span> <span class="o">=</span> <span class="n">sorted_valid_demand</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">max_tx_in_block</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">selected_txs</span>
+
+    <span class="k">def</span> <span class="nf">average_waiting_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_height</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">txs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">sum</span><span class="p">([</span><span class="n">current_height</span> <span class="o">-</span> <span class="n">tx</span><span class="o">.</span><span class="n">start_block</span> <span class="k">for</span> <span class="n">tx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">txs</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">txs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">tx</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="k">for</span> <span class="n">tx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">txs</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">abm1559 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">abm1559.txpool</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Barnabé Monnot.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>

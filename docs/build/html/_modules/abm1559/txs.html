@@ -1,0 +1,163 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>abm1559.txs &#8212; abm1559 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">abm1559 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">abm1559.txs</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for abm1559.txs</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">abm1559.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">rng</span><span class="p">,</span>
+    <span class="n">constants</span><span class="p">,</span>
+<span class="p">)</span>
+
+<div class="viewcode-block" id="Transaction"><a class="viewcode-back" href="../../index.html#abm1559.txs.Transaction">[docs]</a><span class="k">class</span> <span class="nc">Transaction</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An abstract superclass for transactions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">gas_used</span> <span class="o">=</span> <span class="n">constants</span><span class="p">[</span><span class="s2">&quot;SIMPLE_TRANSACTION_GAS&quot;</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sender</span> <span class="o">=</span> <span class="n">sender</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_block</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;start_block&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gas_used</span> <span class="o">=</span> <span class="n">gas_used</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tx_hash</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">bytes</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Tx1559"><a class="viewcode-back" href="../../index.html#abm1559.txs.Tx1559">[docs]</a><span class="k">class</span> <span class="nc">Tx1559</span><span class="p">(</span><span class="n">Transaction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Inherits from :py:class:`abm1559.txs.Transaction`. A 1559-type transaction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">gas_used</span> <span class="o">=</span> <span class="n">constants</span><span class="p">[</span><span class="s2">&quot;SIMPLE_TRANSACTION_GAS&quot;</span><span class="p">]):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">gas_used</span> <span class="o">=</span> <span class="n">gas_used</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">gas_premium</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;gas_premium&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_fee</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;max_fee&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;1559 Transaction </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tx_hash</span><span class="o">.</span><span class="n">hex</span><span class="p">()</span><span class="si">}</span><span class="s2">: max_fee </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_fee</span><span class="si">}</span><span class="s2">, gas_premium </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">gas_premium</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="n">basefee</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;basefee&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_fee</span> <span class="o">&gt;=</span> <span class="n">basefee</span>
+
+    <span class="k">def</span> <span class="nf">gas_price</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="c1"># What the user pays</span>
+        <span class="n">basefee</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;basefee&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_fee</span><span class="p">,</span> <span class="n">basefee</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">gas_premium</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">tip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="c1"># What the miner gets</span>
+        <span class="n">basefee</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;basefee&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gas_price</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">-</span> <span class="n">basefee</span>
+
+    <span class="k">def</span> <span class="nf">tx_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;gas_premium&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gas_premium</span> <span class="o">/</span> <span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="mi">9</span><span class="p">),</span>
+            <span class="s2">&quot;max_fee&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_fee</span> <span class="o">/</span> <span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="mi">9</span><span class="p">),</span>
+            <span class="s2">&quot;start_block&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_block</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="TxEscalator"><a class="viewcode-back" href="../../index.html#abm1559.txs.TxEscalator">[docs]</a><span class="k">class</span> <span class="nc">TxEscalator</span><span class="p">(</span><span class="n">Transaction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Inherits from :py:class:`abm1559.txs.Transaction`. An escalator-type transaction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">gas_used</span> <span class="o">=</span> <span class="n">constants</span><span class="p">[</span><span class="s2">&quot;SIMPLE_TRANSACTION_GAS&quot;</span><span class="p">]):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">gas_used</span> <span class="o">=</span> <span class="n">gas_used</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_block</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;max_block&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_premium</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;start_premium&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_premium</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;max_premium&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Escalator Transaction </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tx_hash</span><span class="o">.</span><span class="n">hex</span><span class="p">()</span><span class="si">}</span><span class="s2">: start block </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start_block</span><span class="si">}</span><span class="s2">, &quot;</span> <span class="o">+</span> \
+                <span class="sa">f</span><span class="s2">&quot;max block </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_block</span><span class="si">}</span><span class="s2">, start premium </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start_premium</span><span class="si">}</span><span class="s2">, max premium </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_premium</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="n">current_block</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;current_block&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_block</span> <span class="o">&lt;=</span> <span class="n">current_block</span> <span class="ow">and</span> <span class="n">current_block</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_block</span>
+
+    <span class="k">def</span> <span class="nf">gas_price</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="c1"># What the user pays</span>
+        <span class="n">current_block</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;current_block&quot;</span><span class="p">]</span>
+        <span class="n">fraction_elapsed</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_block</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_block</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_block</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_block</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_premium</span> <span class="o">+</span> <span class="n">fraction_elapsed</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_premium</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_premium</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">tip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="c1"># What the miner gets</span>
+        <span class="c1"># In the escalator, miner gets the whole gas_price</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gas_price</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">abm1559 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">abm1559.txs</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Barnabé Monnot.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>
