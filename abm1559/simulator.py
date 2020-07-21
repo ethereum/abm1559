@@ -1,17 +1,40 @@
+from typing import Sequence, Dict
+
 from abm1559.utils import (
     rng,
     constants,
 )
 
-from abm1559.users import User1559
+from abm1559.txs import Transaction
+from abm1559.chain import Block
+from abm1559.users import User, User1559
 
-def spawn_demand(timestep, demand_lambda):
+def spawn_poisson_demand(timestep: int, demand_lambda: float) -> Sequence[User1559]:
+    """
+    Args:
+        timestep (int): Current round
+        demand_lambda (float): Rate of arrival, the :math:`lambda` parameter of a Poisson distribution
+
+    Returns:
+        Sequence[User1559]: An array of 1559 users
+    """
+
     real = rng.poisson(demand_lambda)
     new_users = [User1559(timestep) for i in range(real)]
     return new_users
 
-def decide_transactions(demand, params):
-    # User side
+def decide_transactions(demand: Sequence[User], params: Dict) -> Sequence[Transaction]:
+    """
+    Queries all users and checks who wants to send transactions and who wants to balk.
+
+    Args:
+        demand (Sequence[User]): Current demand
+        params (Dict): Current simulation environment parameters (e.g., basefee)
+
+    Returns:
+        Sequence[Transaction]: An array of transactions
+    """
+
     txs = []
     basefee = params["basefee"]
 
@@ -24,20 +47,18 @@ def decide_transactions(demand, params):
 
     return txs
 
-def select_transactions(txpool, params):
-    # Miner side
-    basefee = params["basefee"]
-    max_tx_in_block = int(constants["MAX_GAS_EIP1559"] / constants["SIMPLE_TRANSACTION_GAS"])
+def update_basefee(block: Block, basefee: int) -> int:
+    """
+    Basefee update rule
 
-    sorted_valid_demand = sorted(
-        [tx for tx in txpool.txs.values() if tx.is_valid({ "basefee": basefee })],
-        key = lambda tx: -tx.tip({ "basefee": basefee })
-    )
-    selected_txs = sorted_valid_demand[0:max_tx_in_block]
+    Args:
+        block (Block): The previous block
+        basefee (int): The current basefee
 
-    return selected_txs
+    Returns:
+        int: The new basefee
+    """
 
-def update_basefee(block, basefee):
     gas_used = sum([tx.gas_used for tx in block.txs])
     delta = gas_used - constants["TARGET_GAS_USED"]
     return basefee + basefee * delta // constants["TARGET_GAS_USED"] // constants["BASEFEE_MAX_CHANGE_DENOMINATOR"]

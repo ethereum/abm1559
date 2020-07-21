@@ -33,7 +33,7 @@ for t in range(200):
         "current_block": t,
     })
     txpool.add_txs(decided_txs)
-    selected_txs = select_transactions(txpool, {
+    txpool.select_transactions({
         "basefee": basefee,
         "current_block": t,
     })

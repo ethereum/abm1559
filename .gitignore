@@ -1,6 +1,5 @@
 .DS_Store
-__py_cache__
+__pycache__
 *.egg-info
 build
-Pipfile
-Pipfile.lock
+.ipynb_checkpoints

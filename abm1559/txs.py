@@ -4,6 +4,9 @@ from abm1559.utils import (
 )
 
 class Transaction:
+    """
+    An abstract superclass for transactions.
+    """
 
     def __init__(self, sender, params, gas_used = constants["SIMPLE_TRANSACTION_GAS"]):
         self.sender = sender
@@ -12,6 +15,9 @@ class Transaction:
         self.tx_hash = rng.bytes(8)
 
 class Tx1559(Transaction):
+    """
+    Inherits from :py:class:`abm1559.txs.Transaction`. A 1559-type transaction.
+    """
 
     def __init__(self, sender, params, gas_used = constants["SIMPLE_TRANSACTION_GAS"]):
         super().__init__(sender, params, gas_used = gas_used)
@@ -36,7 +42,17 @@ class Tx1559(Transaction):
         basefee = params["basefee"]
         return self.gas_price(params) - basefee
 
+    def tx_data(self):
+        return {
+            "gas_premium": self.gas_premium / (10 ** 9),
+            "max_fee": self.max_fee / (10 ** 9),
+            "start_block": self.start_block,
+        }
+
 class TxEscalator(Transaction):
+    """
+    Inherits from :py:class:`abm1559.txs.Transaction`. An escalator-type transaction.
+    """
 
     def __init__(self, sender, params, gas_used = constants["SIMPLE_TRANSACTION_GAS"]):
         super().__init__(sender, params, gas_used = gas_used)
