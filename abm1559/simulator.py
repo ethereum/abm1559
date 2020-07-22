@@ -9,7 +9,7 @@ from abm1559.txs import Transaction
 from abm1559.chain import Block
 from abm1559.users import User, User1559
 
-def spawn_poisson_demand(timestep: int, demand_lambda: float) -> Sequence[User1559]:
+def spawn_poisson_demand(timestep: int, demand_lambda: float, UserClass) -> Sequence[User]:
     """
     Args:
         timestep (int): Current round
@@ -20,7 +20,7 @@ def spawn_poisson_demand(timestep: int, demand_lambda: float) -> Sequence[User15
     """
 
     real = rng.poisson(demand_lambda)
-    new_users = [User1559(timestep) for i in range(real)]
+    new_users = [UserClass(timestep) for i in range(real)]
     return new_users
 
 def decide_transactions(demand: Sequence[User], params: Dict) -> Sequence[Transaction]:
