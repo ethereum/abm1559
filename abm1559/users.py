@@ -1,3 +1,7 @@
+from typing import Dict
+
+import pandas as pd
+
 from abm1559.utils import (
     get_basefee_bounds,
     rng
@@ -32,6 +36,12 @@ class User:
         gas_price = params["gas_price"]
         return self.cost(params) - gas_price
 
+    def export(self):
+        return {
+            "pub_key": self.pub_key,
+            "value": self.value,
+        }
+
 class AffineUser(User):
     """
     Affine users incur a fixed cost per unit of time.
@@ -49,6 +59,13 @@ class AffineUser(User):
         elapsed_time = current_block - self.wakeup_block
         return self.value - self.cost_per_unit * elapsed_time
 
+    def export(self):
+        return {
+            "user_type": "affine_user",
+            "cost_per_unit": self.cost_per_unit,
+            **super().export(),
+        }
+
 class DiscountUser(User):
     """
     The value of discount users is reduced over time.
@@ -65,6 +82,13 @@ class DiscountUser(User):
         current_block = params["current_block"]
         elapsed_time = current_block - self.wakeup_block
         return self.value * (1 - self.discount_rate) ** elapsed_time
+
+    def export(self):
+        return {
+            "user_type": "discount_user",
+            "discount_rate": self.discount_rate,
+            **super().export(),
+        }
 
 class User1559(AffineUser):
     """
@@ -113,3 +137,21 @@ class User1559(AffineUser):
             params = tx_params,
         )
         return tx
+
+class UserPool:
+
+    def __init__(self):
+        self.users = {}
+
+    def add_users(self, users):
+        for user in users:
+            self.users[user.pub_key] = user
+
+    def get_user(self, pub_key):
+        return self.users[user.pub_key]
+
+    def export(self):
+        df = []
+        for user in self.users.values():
+            df += [user.export()]
+        return pd.DataFrame(df)

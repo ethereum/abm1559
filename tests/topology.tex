@@ -1,0 +1,56 @@
+%!TEX root = ../main.tex
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\linewidth]{Coloring/Figures/netstatcorr.pdf}
+  \caption{Scatterplot of the measure of cost for each dynamics (average resulting number of matches for BR and MWU, average player cost for the behavioural model). Simulations with 2 or 4 receivers appear on the same plot. Values of the network statistics and cost are rescaled for plotting (no incidence on the Spearman correlation coefficient). As either the average distance or the clustering coefficient of the network increases, the cost increases.}
+	\label{fig:netstatcorr}
+\end{figure}
+
+\subsection{Influence of network topology on costs}
+The three dynamics are repeated on 80 networks, 20 per type, with 20 nodes each. The additional networks were generated from the same rules which yielded the four networks in the study. For each of these networks, 25 sets of receivers were sampled randomly for \( k = \{2, 4\} \). For each set of receivers, the three dynamics were sampled from 50 times to obtain the average number of matches resulting from BR and MWU or the average player cost from the behavioural model. Once again, the correlation between these statistics and the centrality of the receivers were computed and shown to be significantly negative for most networks.
+
+Figure \ref{fig:netgbc} charts the distribution of these correlation coefficients for the two experimental conditions and each of the four types. Again, contrasts exist between the four different types. Preferential attachment networks such as \textit{ba} have the strongest negative correlation between centrality and efficiency of the suggestion. On the other hand, over half of Watts-Strogatz networks have a positive correlation for the behavioural model simulations with 2 receivers and typically do not feature as strong negative correlations as the three other types in remaining treatments.
+
+The differences are explained by the topology of the networks, as measured by network statistics such as the clustering coefficient or the average distance between two vertices. On the same set of 80 networks, a strong negative correlation is found between any of the two previous statistics and cost (Figure \ref{fig:netstatcorr} and Table \ref{tab:col/gennetcor}). Thus, a more clustered network leads to increased cost, as does a network with larger average distance. Watts-Strogatz networks, among the four considered types, are indeed more clustered and have higher average distance than any other type (Table \ref{tab:col/gennetstat}).
+
+\begin{table}\centering
+  \caption{Spearman rank correlation coefficient between one network statistic (average distance or clustering coefficient) and a measure of system inefficiency (average number of matches for BR and MWU, average player cost for the behavioural model), for each simulated dynamics.
+  Simulations were carried over 80 networks of 20 nodes each, 20 networks per type. 25 receiver sets were sampled for each network at sizes 2 and 4 (resp. 10\% and 20\% of nodes), with each dynamics run for 50 times on each set. Averages are obtained over all receiver sets.
+  Significance levels are given next to the values: (*) \( p < 0.05 \), (**) \( p < 0.01 \), (***) \( p< 0.001 \).}
+  \label{tab:col/gennetcor}
+  \begin{tabular}{l|l|l}
+  \toprule
+  Dynamics & Statistic & Correlation \\
+  \midrule
+  \multirow{2}{*}{BR} & Average distance & 0.647 (***) \\
+    & Clustering coefficient & 0.628 (***) \\
+  \midrule
+  \multirow{2}{*}{MWU} & Average distance & 0.362 (***) \\
+    & Clustering coefficient & 0.207 (**) \\
+  \midrule
+  & & \\
+  \midrule
+  \multirow{2}{*}{Behavioural model} & Average distance & 0.681 (***) \\
+    & Clustering coefficient & 0.628 (***) \\
+  \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}\centering
+  \caption{Average network statistics (average distance and clustering coefficient) for 80 additional generated networks, 20 per types.}
+  \label{tab:col/gennetstat}
+  \begin{tabular}{l|l|l}
+  \toprule
+  Network & Average distance & Clustering coefficient \\
+  \midrule
+  ba & 2.12 & 0.208 \\
+  \midrule
+  ws & 2.42 & 0.342 \\
+  \midrule
+  er & 2.20 & 0.194 \\
+  \midrule
+  sb & 2.23 & 0.180 \\
+  \bottomrule
+  \end{tabular}
+\end{table}

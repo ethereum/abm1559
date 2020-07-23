@@ -14,6 +14,15 @@ class Transaction:
         self.gas_used = gas_used
         self.tx_hash = rng.bytes(8)
 
+    def tx_data(self):
+        return {
+            "start_block": self.start_block,
+            "sender": self.sender,
+            "gas_used": self.gas_used,
+            "tx_hash": self.tx_hash,
+        }
+
+
 class Tx1559(Transaction):
     """
     Inherits from :py:class:`abm1559.txs.Transaction`. A 1559-type transaction.
@@ -44,9 +53,9 @@ class Tx1559(Transaction):
 
     def tx_data(self):
         return {
+            **super().tx_data(),
             "gas_premium": self.gas_premium / (10 ** 9),
             "max_fee": self.max_fee / (10 ** 9),
-            "start_block": self.start_block,
         }
 
 class TxEscalator(Transaction):
