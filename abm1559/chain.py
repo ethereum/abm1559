@@ -47,7 +47,7 @@ class Block1559(Block):
             txs_data += [{
                 "block_height": self.height,
                 "tx_index": tx_index,
-                "basefee": self.basefee / (10 ** 9),
+                "basefee": self.basefee / (10 ** 9), # in Gwei
                 **tx.tx_data(),
             }]
         return txs_data

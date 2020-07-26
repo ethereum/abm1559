@@ -16,12 +16,12 @@ class Transaction:
 
     def tx_data(self):
         return {
+            "tx": self,
             "start_block": self.start_block,
             "sender": self.sender,
             "gas_used": self.gas_used,
             "tx_hash": self.tx_hash,
         }
-
 
 class Tx1559(Transaction):
     """

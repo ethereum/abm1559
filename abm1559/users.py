@@ -29,15 +29,20 @@ class User:
         self.pub_key = rng.bytes(8)
         self.wakeup_block = wakeup_block
 
-        # Users have a value / Gwei for the transaction
+        # Users have a value (in wei) per unit of gas for the transaction
         self.value = int(rng.uniform(low = 0, high = 20) * (10 ** 9))
 
     def payoff(self, params):
+        """
+        Args:
+            params (Dict): Includes `gas_price` in wei
+        """
         gas_price = params["gas_price"]
         return self.cost(params) - gas_price
 
     def export(self):
         return {
+            "user": self,
             "pub_key": self.pub_key,
             "value": self.value,
         }
