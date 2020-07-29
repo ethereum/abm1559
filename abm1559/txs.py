@@ -51,11 +51,12 @@ class Tx1559(Transaction):
         basefee = params["basefee"]
         return self.gas_price(params) - basefee
 
-    def tx_data(self):
+    def tx_data(self, params):
         return {
             **super().tx_data(),
             "gas_premium": self.gas_premium / (10 ** 9),
             "max_fee": self.max_fee / (10 ** 9),
+            "tip": self.tip(params),
         }
 
 class TxEscalator(Transaction):

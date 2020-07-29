@@ -63,8 +63,11 @@ class TxPool:
         basefee = params["basefee"]
         max_tx_in_block = int(constants["MAX_GAS_EIP1559"] / constants["SIMPLE_TRANSACTION_GAS"])
 
+        valid_txs = [tx for tx in self.txs.values() if tx.is_valid({ "basefee": basefee })]
+        rng.shuffle(valid_txs)
+
         sorted_valid_demand = sorted(
-            [tx for tx in self.txs.values() if tx.is_valid({ "basefee": basefee })],
+            valid_txs,
             key = lambda tx: -tx.tip({ "basefee": basefee })
         )
         selected_txs = sorted_valid_demand[0:max_tx_in_block]

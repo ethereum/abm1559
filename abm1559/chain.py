@@ -41,6 +41,9 @@ class Block1559(Block):
             "current_block": self.height,
         }) for tx in self.txs]) / len(self.txs) / (10 ** 9)
 
+    def min_premium(self): # in wei
+        return 0 if len(self.txs) == 0 else min([tx.gas_premium for tx in self.txs])
+
     def txs_data(self):
         txs_data = []
         for tx_index, tx in enumerate(self.txs):
@@ -48,7 +51,9 @@ class Block1559(Block):
                 "block_height": self.height,
                 "tx_index": tx_index,
                 "basefee": self.basefee / (10 ** 9), # in Gwei
-                **tx.tx_data(),
+                **tx.tx_data({
+                    "basefee": self.basefee
+                }),
             }]
         return txs_data
 

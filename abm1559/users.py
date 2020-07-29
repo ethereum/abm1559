@@ -44,7 +44,8 @@ class User:
         return {
             "user": self,
             "pub_key": self.pub_key,
-            "value": self.value,
+            "value": self.value / (10 ** 9), # in Gwei
+            "wakeup_block": self.wakeup_block,
         }
 
 class AffineUser(User):
@@ -66,9 +67,9 @@ class AffineUser(User):
 
     def export(self):
         return {
-            "user_type": "affine_user",
-            "cost_per_unit": self.cost_per_unit,
             **super().export(),
+            "user_type": "affine_user",
+            "cost_per_unit": self.cost_per_unit / (10 ** 9), # in Gwei
         }
 
 class DiscountUser(User):
@@ -90,9 +91,9 @@ class DiscountUser(User):
 
     def export(self):
         return {
+            **super().export(),
             "user_type": "discount_user",
             "discount_rate": self.discount_rate,
-            **super().export(),
         }
 
 class User1559(AffineUser):
@@ -101,32 +102,25 @@ class User1559(AffineUser):
     """
     # Expects to be included within 5 blocks
     # Prefers not to participate if its expected payoff is negative
-    # Computes expected payoff by estimating the worst possible basefee 5 blocks from now
     # Fixed gas_premium
 
     def expected_time(self, params):
         return 5
 
-    def decide_parameters(self):
+    def decide_parameters(self, params):
         gas_premium = 1 * (10 ** 9)
-        # max_fee = self.value - self.expected_time(params = {}) * self.cost_per_unit
         max_fee = self.value
         return {
-            "max_fee": max_fee,
-            "gas_premium": gas_premium,
+            "max_fee": max_fee, # in wei
+            "gas_premium": gas_premium, # in wei
             "start_block": self.wakeup_block,
         }
-
-    def worst_expected_basefee(self, current_basefee):
-        basefee_bounds = get_basefee_bounds(current_basefee, self.expected_time(params = {}))
-        return basefee_bounds["ub"]
 
     def transact(self, params):
         basefee = params["basefee"]
 
-        tx_params = self.decide_parameters()
+        tx_params = self.decide_parameters(params)
 
-        # expected_gas_price = min(self.worst_expected_basefee(basefee) + tx_params["gas_premium"], tx_params["max_fee"])
         expected_gas_price = min(basefee + tx_params["gas_premium"], tx_params["max_fee"])
         expected_block = self.wakeup_block + self.expected_time(params = {})
         expected_payoff = self.payoff({
@@ -142,6 +136,50 @@ class User1559(AffineUser):
             params = tx_params,
         )
         return tx
+
+    def export(self):
+        return {
+            **super().export(),
+            "user_type": "user_1559",
+        }
+
+    def __str__(self):
+        return f"1559 affine user with value {self.value} and cost {self.cost_per_unit}"
+
+class StrategicUser1559(User1559):
+    """
+    A strategic affine user sending 1559 transactions.
+    """
+    # Expects to be included in the next block
+    # Prefers not to participate if its expected payoff is negative
+    # Strategic gas_premium
+
+    def expected_time(self, params):
+        return 1
+
+    def decide_parameters(self, params):
+        if params["min_premium"] is None:
+            min_premium = 1 * (10 ** 9)
+        else:
+            min_premium = params["min_premium"]
+
+        gas_premium = min_premium + 0.1 * (10 ** 9) # * rng.uniform(low = 0, high = 1)
+        max_fee = self.value
+
+        return {
+            "max_fee": max_fee, # in wei
+            "gas_premium": gas_premium, # in wei
+            "start_block": self.wakeup_block,
+        }
+
+    def export(self):
+        return {
+            **super().export(),
+            "user_type": "strategic_user_1559",
+        }
+
+    def __str__(self):
+        return f"1559 strategic affine user with value {self.value} and cost {self.cost_per_unit}"
 
 class UserPool:
 
