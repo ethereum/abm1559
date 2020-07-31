@@ -20,7 +20,7 @@ class Transaction:
             "start_block": self.start_block,
             "sender": self.sender,
             "gas_used": self.gas_used,
-            "tx_hash": self.tx_hash,
+            "tx_hash": self.tx_hash.hex(),
         }
 
 class Tx1559(Transaction):
