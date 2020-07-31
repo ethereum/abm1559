@@ -7,7 +7,7 @@ setup(
     author_email='barnabe.monnot@ethereum.org',
     packages=find_packages(include=['abm1559', 'abm1559.*']),
     install_requires=['numpy', 'pandas'],
-    version='0.0.1',
+    version='0.0.2',
     license='MIT',
     description='Agent-based simulation environment for EIP 1559',
     long_description=open('README.md').read(),
