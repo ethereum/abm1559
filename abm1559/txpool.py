@@ -74,6 +74,13 @@ class TxPool:
 
         return selected_txs
 
+    def average_value(self, user_pool):
+        avg = 0.0
+        for tx in self.txs.values():
+            sender = user_pool.users[tx.sender]
+            avg += sender.value / self.pool_length
+        return avg
+
     def average_waiting_time(self, current_height):
         return 0 if len(self.txs) == 0 else sum([current_height - tx.start_block for tx in self.txs.values()]) / len(self.txs)
 

@@ -13,10 +13,10 @@ class User:
     """
     Users submit transactions. They have a (randomly chosen) value per Gwei $v$, (we choose per Gwei such that all evaluations of their welfare can be done independently of how much gas the transaction uses).
 
-    The user evaluates the total cost of the transaction in one of two ways, embodied by two different subclasses:
+    The user evaluates its current value ($cv$) in one of two ways, embodied by two different subclasses:
 
-    - :py:class:`abm1559.users.AffineUser`: Incurs a fixed (but randomly selected) cost :math:`c` per unit of time (block-to-block), so :math:`cost(t) = v - c * t`.
-    - :py:class:`abm1559.users.DiscountUser`: Incurs a discount :math:`\delta` over time, so :math:`cost(t) = v * (1 - \delta)^t`.
+    - :py:class:`abm1559.users.AffineUser`: Incurs a fixed (but randomly selected) cost :math:`c` per unit of time (block-to-block), so :math:`cv(t) = v - c * t`.
+    - :py:class:`abm1559.users.DiscountUser`: Incurs a discount :math:`\delta` over time, so :math:`cv(t) = v * (1 - \delta)^t`.
 
     `AffineUser` or `DiscountUser` are subclassed to create users who send different types of transactions, e.g., 1559-type transactions, escalators or something different. The subclasses should implement:
 
@@ -32,18 +32,37 @@ class User:
         # Users have a value (in wei) per unit of gas for the transaction
         self.value = int(rng.uniform(low = 0, high = 20) * (10 ** 9))
 
+    def cost(self, params):
+        """
+        Args:
+            params (Dict): Includes `gas_price` in wei
+        """
+        gas_price = params["gas_price"]
+        return self.value - self.current_value(params) + gas_price
+
     def payoff(self, params):
         """
         Args:
             params (Dict): Includes `gas_price` in wei
         """
         gas_price = params["gas_price"]
-        return self.cost(params) - gas_price
+        return self.current_value(params) - gas_price
+
+    def transact(self, params):
+        tx = self.create_transaction(params)
+        if tx is None:
+            self.tx_hash = None
+        else:
+            self.tx_hash = tx.tx_hash
+        return tx
+
+    def cancel(self, tx):
+        return False
 
     def export(self):
         return {
             "user": self,
-            "pub_key": self.pub_key,
+            "pub_key": self.pub_key.hex(),
             "value": self.value / (10 ** 9), # in Gwei
             "wakeup_block": self.wakeup_block,
         }
@@ -60,7 +79,7 @@ class AffineUser(User):
     def __str__(self):
         return f"Affine User with value {self.value} and cost {self.cost_per_unit}"
 
-    def cost(self, params):
+    def current_value(self, params):
         current_block = params["current_block"]
         elapsed_time = current_block - self.wakeup_block
         return self.value - self.cost_per_unit * elapsed_time
@@ -84,7 +103,7 @@ class DiscountUser(User):
     def __str__(self):
         return f"Discount User with value {self.value} and discount rate {self.discount_rate}"
 
-    def cost(self, params):
+    def current_value(self, params):
         current_block = params["current_block"]
         elapsed_time = current_block - self.wakeup_block
         return self.value * (1 - self.discount_rate) ** elapsed_time
@@ -116,7 +135,7 @@ class User1559(AffineUser):
             "start_block": self.wakeup_block,
         }
 
-    def transact(self, params):
+    def create_transaction(self, params):
         basefee = params["basefee"]
 
         tx_params = self.decide_parameters(params)
@@ -137,6 +156,13 @@ class User1559(AffineUser):
         )
         return tx
 
+    def cancel(self, tx, params):
+        if "cancel_cost" in params:
+            cancel_cost = params["cancel_cost"]
+        else:
+            cancel_cost = 0
+        return self.current_value(params) - cancel_cost < 0
+
     def export(self):
         return {
             **super().export(),
@@ -145,56 +171,3 @@ class User1559(AffineUser):
 
     def __str__(self):
         return f"1559 affine user with value {self.value} and cost {self.cost_per_unit}"
-
-class StrategicUser1559(User1559):
-    """
-    A strategic affine user sending 1559 transactions.
-    """
-    # Expects to be included in the next block
-    # Prefers not to participate if its expected payoff is negative
-    # Strategic gas_premium
-
-    def expected_time(self, params):
-        return 1
-
-    def decide_parameters(self, params):
-        if params["min_premium"] is None:
-            min_premium = 1 * (10 ** 9)
-        else:
-            min_premium = params["min_premium"]
-
-        gas_premium = min_premium + 0.1 * (10 ** 9) # * rng.uniform(low = 0, high = 1)
-        max_fee = self.value
-
-        return {
-            "max_fee": max_fee, # in wei
-            "gas_premium": gas_premium, # in wei
-            "start_block": self.wakeup_block,
-        }
-
-    def export(self):
-        return {
-            **super().export(),
-            "user_type": "strategic_user_1559",
-        }
-
-    def __str__(self):
-        return f"1559 strategic affine user with value {self.value} and cost {self.cost_per_unit}"
-
-class UserPool:
-
-    def __init__(self):
-        self.users = {}
-
-    def add_users(self, users):
-        for user in users:
-            self.users[user.pub_key] = user
-
-    def get_user(self, pub_key):
-        return self.users[user.pub_key]
-
-    def export(self):
-        df = []
-        for user in self.users.values():
-            df += [user.export()]
-        return pd.DataFrame(df)

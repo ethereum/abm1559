@@ -5,13 +5,12 @@ from abm1559.utils import (
     constants,
 )
 
-from abm1559.txs import Transaction
 from abm1559.chain import Block
 from abm1559.users import User, User1559
 
 def spawn_poisson_demand(timestep: int, demand_lambda: float, UserClass) -> Sequence[User]:
     """
-    One-step demand from uniform users, with demand size drawn from a Poisson distribution.
+    One-step demand from homogeneous users, with demand size drawn from a Poisson distribution.
 
     Args:
         timestep (int): Current round
@@ -26,9 +25,17 @@ def spawn_poisson_demand(timestep: int, demand_lambda: float, UserClass) -> Sequ
     new_users = [UserClass(timestep) for i in range(demand_size)]
     return new_users
 
-def spawn_poisson_heterogeneous_demand(timestep: int, demand_lambda: float, shares: Dict) -> Sequence[User]:
+def spawn_poisson_heterogeneous_demand(timestep: int, demand_lambda: float, shares: Dict[type, float]) -> Sequence[User]:
     """
+    One-step demand from heterogeneous users, with demand size drawn from a Poisson distribution.
 
+    Args:
+        timestep (int): Current round
+        demand_lambda (float): Rate of arrival, the :math:`lambda` parameter of a Poisson distribution
+        UserClass (Dict[type, float]): Keys are user classes (subclasses of :py:class:`abm1559.users.User`), values are the share of each user class to spawn this round. Shares are expected to sum to 1.
+
+    Returns:
+        Sequence[User]: An array of users
     """
 
     new_users = []
@@ -38,7 +45,7 @@ def spawn_poisson_heterogeneous_demand(timestep: int, demand_lambda: float, shar
         new_users += [UserClass(timestep) for i in range(size)]
     return new_users
 
-def shares_to_sizes(shares: Dict, demand_size: int) -> Dict:
+def shares_to_sizes(shares: Dict[type, float], demand_size: int) -> Dict[type, int]:
     new_sizes = {}
     for i, (UserClass, share) in enumerate(shares.items()):
         if i == len(shares.values()) - 1: # last item
@@ -46,27 +53,6 @@ def shares_to_sizes(shares: Dict, demand_size: int) -> Dict:
         else:
             new_sizes[UserClass] = int(share * demand_size)
     return new_sizes
-
-def decide_transactions(demand: Sequence[User], params: Dict) -> Sequence[Transaction]:
-    """
-    Queries all users and checks who wants to send transactions and who wants to balk.
-
-    Args:
-        demand (Sequence[User]): Current demand
-        params (Dict): Current simulation environment parameters (e.g., basefee)
-
-    Returns:
-        Sequence[Transaction]: An array of transactions
-    """
-
-    txs = []
-
-    for user in demand:
-        tx = user.transact(params)
-        if not tx is None:
-            txs.append(tx)
-
-    return txs
 
 def update_basefee(block: Block, basefee: int) -> int:
     """

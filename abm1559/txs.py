@@ -18,7 +18,7 @@ class Transaction:
         return {
             "tx": self,
             "start_block": self.start_block,
-            "sender": self.sender,
+            "sender": self.sender.hex(),
             "gas_used": self.gas_used,
             "tx_hash": self.tx_hash.hex(),
         }
