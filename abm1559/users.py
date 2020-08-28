@@ -11,9 +11,9 @@ from abm1559.txs import Tx1559
 
 class User:
     """
-    Users submit transactions. They have a (randomly chosen) value per Gwei $v$, (we choose per Gwei such that all evaluations of their welfare can be done independently of how much gas the transaction uses).
+    Users submit transactions. They have a (randomly chosen) value per Gwei :math:`v`, (we choose per Gwei such that all evaluations of their welfare can be done independently of how much gas the transaction uses).
 
-    The user evaluates its current value ($cv$) in one of two ways, embodied by two different subclasses:
+    The user evaluates its current value (:math:`cv`) in one of two ways, embodied by two different subclasses:
 
     - :py:class:`abm1559.users.AffineUser`: Incurs a fixed (but randomly selected) cost :math:`c` per unit of time (block-to-block), so :math:`cv(t) = v - c * t`.
     - :py:class:`abm1559.users.DiscountUser`: Incurs a discount :math:`\delta` over time, so :math:`cv(t) = v * (1 - \delta)^t`.
