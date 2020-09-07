@@ -11,6 +11,7 @@ asyncio-nats-client = "*"
 jupyterlab = "*"
 matplotlib = "*"
 pandas = "*"
+cadcad = "*"
 
 [requires]
 python_version = "3.8"
