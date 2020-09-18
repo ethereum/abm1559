@@ -12,6 +12,7 @@ jupyterlab = "*"
 matplotlib = "*"
 pandas = "*"
 cadcad = "*"
+seaborn = "*"
 
 [requires]
 python_version = "3.8"

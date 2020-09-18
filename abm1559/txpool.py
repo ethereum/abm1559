@@ -45,6 +45,10 @@ class TxPool:
         for tx_hash in tx_hashes:
             del(self.txs[tx_hash])
         self.pool_length -= len(tx_hashes)
+        
+    def remove_invalid_txs(self, params):
+        invalid_txs = [tx_hash for tx_hash, tx in self.txs.items() if not tx.is_valid(params)]
+        self.remove_txs(invalid_txs)
 
     def average_tip(self, params): # in Gwei
         if self.pool_length == 0:
@@ -60,15 +64,14 @@ class TxPool:
 
     def select_transactions(self, params):
         # Miner side
-        basefee = params["basefee"]
         max_tx_in_block = int(constants["MAX_GAS_EIP1559"] / constants["SIMPLE_TRANSACTION_GAS"])
 
-        valid_txs = [tx for tx in self.txs.values() if tx.is_valid({ "basefee": basefee })]
+        valid_txs = [tx for tx in self.txs.values() if tx.is_valid(params)]
         rng.shuffle(valid_txs)
 
         sorted_valid_demand = sorted(
             valid_txs,
-            key = lambda tx: -tx.tip({ "basefee": basefee })
+            key = lambda tx: -tx.tip(params)
         )
         selected_txs = sorted_valid_demand[0:max_tx_in_block]
 

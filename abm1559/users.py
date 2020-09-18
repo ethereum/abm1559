@@ -7,7 +7,10 @@ from abm1559.utils import (
     rng
 )
 
-from abm1559.txs import Tx1559
+from abm1559.txs import (
+    Tx1559,
+    TxFloatingEsc
+)
 
 class User:
     """
@@ -136,12 +139,18 @@ class User1559(AffineUser):
         }
 
     def create_transaction(self, params):
-        basefee = params["basefee"]
-
         tx_params = self.decide_parameters(params)
-
-        expected_gas_price = min(basefee + tx_params["gas_premium"], tx_params["max_fee"])
-        expected_block = self.wakeup_block + self.expected_time(params = {})
+        
+        tx = Tx1559(
+            sender = self.pub_key,
+            params = tx_params,
+        )
+    
+        expected_block = self.wakeup_block + self.expected_time(params)
+        expected_gas_price = tx.gas_price({
+            **params,
+            "current_block": expected_block
+        })
         expected_payoff = self.payoff({
             "gas_price": expected_gas_price,
             "current_block": expected_block,
@@ -150,10 +159,6 @@ class User1559(AffineUser):
         if expected_payoff < 0 or tx_params["max_fee"] < 0:
             return None
 
-        tx = Tx1559(
-            sender = self.pub_key,
-            params = tx_params,
-        )
         return tx
 
     def cancel(self, tx, params):
@@ -171,3 +176,68 @@ class User1559(AffineUser):
 
     def __str__(self):
         return f"1559 affine user with value {self.value} and cost {self.cost_per_unit}"
+
+class UserFloatingEsc(AffineUser):
+    """
+    An affine user sending floating escalator transactions.
+    """
+    # Expects to be included within 5 blocks
+    # Prefers not to participate if its expected payoff is negative
+
+    def expected_time(self, params):
+        return 1
+
+    def decide_parameters(self, params):
+        ramp_length = 5
+        max_fee = self.value - ramp_length * self.cost_per_unit
+        slope = (max_fee - params["basefee"]) / (ramp_length + 1)
+        max_block = self.wakeup_block + ramp_length
+        start_premium = slope
+        
+        tx_params = {
+            "max_fee": max_fee, # in wei
+            "start_premium": start_premium, # in wei
+            "start_block": self.wakeup_block,
+            "max_block": max_block,
+            "basefee": params["basefee"],
+        }
+        return tx_params
+
+    def create_transaction(self, params):
+        tx_params = self.decide_parameters(params)
+        
+        tx = TxFloatingEsc(
+            sender = self.pub_key,
+            params = tx_params,
+        )
+        
+        expected_block = self.wakeup_block + self.expected_time(params)
+        expected_gas_price = tx.gas_price({
+            **params,
+            "current_block": expected_block,
+        })
+        expected_payoff = self.payoff({
+            "gas_price": expected_gas_price,
+            "current_block": expected_block,
+        })
+
+        if expected_payoff < 0 or tx_params["max_fee"] < 0:
+            return None
+
+        return tx
+
+    def cancel(self, tx, params):
+        if "cancel_cost" in params:
+            cancel_cost = params["cancel_cost"]
+        else:
+            cancel_cost = 0
+        return self.current_value(params) - cancel_cost < 0
+
+    def export(self):
+        return {
+            **super().export(),
+            "user_type": "user_floatingesc",
+        }
+
+    def __str__(self):
+        return f"Floating escalator affine user with value {self.value} and cost {self.cost_per_unit}"

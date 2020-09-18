@@ -22,7 +22,7 @@ class Block:
 
 class Block1559(Block):
     """
-    Blocks filled up with 1559 transactions (see :py:class:`abm1559.chain.Tx1559`).
+    Blocks filled up with 1559 transactions (see :py:class:`abm1559.txs.Tx1559`) or 1559-like transactions (e.g., floating escalator transactions :py:class:`abm1559.txs.TxFloatingEsc`).
     """
 
     def __init__(self, txs, parent_hash, height, basefee):
@@ -52,7 +52,8 @@ class Block1559(Block):
                 "tx_index": tx_index,
                 "basefee": self.basefee / (10 ** 9), # in Gwei
                 **tx.tx_data({
-                    "basefee": self.basefee
+                    "basefee": self.basefee,
+                    "current_block": self.height,
                 }),
             }]
         return txs_data
