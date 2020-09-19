@@ -187,22 +187,6 @@ class UserFloatingEsc(AffineUser):
     def expected_time(self, params):
         return 1
 
-    def decide_parameters(self, params):
-        ramp_length = 5
-        max_fee = self.value - ramp_length * self.cost_per_unit
-        slope = (max_fee - params["basefee"]) / (ramp_length + 1)
-        max_block = self.wakeup_block + ramp_length
-        start_premium = slope
-        
-        tx_params = {
-            "max_fee": max_fee, # in wei
-            "start_premium": start_premium, # in wei
-            "start_block": self.wakeup_block,
-            "max_block": max_block,
-            "basefee": params["basefee"],
-        }
-        return tx_params
-
     def create_transaction(self, params):
         tx_params = self.decide_parameters(params)
         
