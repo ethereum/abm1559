@@ -125,6 +125,10 @@ class TxFloatingEsc(Transaction):
         # What the user pays
         current_block = params["current_block"]
         basefee = params["basefee"]
+        
+        if self.start_block == self.max_block:
+            return min(self.max_fee, basefee + self.start_premium)
+        
         fraction_elapsed = (current_block - self.start_block) / (self.max_block - self.start_block)
         gas_premium = self.start_premium + fraction_elapsed * (self.max_premium - self.start_premium)
         return min(self.max_fee, basefee + gas_premium)
@@ -140,5 +144,4 @@ class TxFloatingEsc(Transaction):
             "start_premium": self.start_premium / (10 ** 9),
             "max_fee": self.max_fee / (10 ** 9),
             "tip": self.tip(params) / (10 ** 9),
-            "slope": (self.max_premium - self.start_premium) / (self.max_block - self.start_block) / (10 ** 9)
         }
