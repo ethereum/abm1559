@@ -1,7 +1,8 @@
 from typing import Sequence, Dict
 
+from abm1559.config import rng
+
 from abm1559.utils import (
-    rng,
     constants,
 )
 
@@ -20,7 +21,8 @@ def spawn_poisson_demand(timestep: int, demand_lambda: float, UserClass) -> Sequ
     Returns:
         Sequence[User]: An array of users
     """
-
+    
+    global rng
     demand_size = rng.poisson(demand_lambda)
     new_users = [UserClass(timestep) for i in range(demand_size)]
     return new_users

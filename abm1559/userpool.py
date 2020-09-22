@@ -32,7 +32,7 @@ class UserPool:
         return txs
 
     def get_user(self, pub_key):
-        return self.users[user.pub_key]
+        return self.users[pub_key]
 
     def cancel_transactions(self, txpool, params):
         """
@@ -47,7 +47,7 @@ class UserPool:
 
         cancelled_txs = []
         for tx in txpool.txs.values():
-            user = self.users[tx.sender]
+            user = get_user(tx.sender)
             cancel = user.cancel(tx, params)
             if cancel:
                 cancelled_txs += [tx.tx_hash]

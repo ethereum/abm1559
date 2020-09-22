@@ -1,7 +1,7 @@
 import sys
 import pandas as pd
 
-from abm1559.utils import rng
+from abm1559.config import rng
 
 class Block:
     """
