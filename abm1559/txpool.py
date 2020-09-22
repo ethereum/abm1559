@@ -46,6 +46,17 @@ class TxPool:
             del(self.txs[tx_hash])
         self.pool_length -= len(tx_hashes)
 
+    def cancel_txs(self, tx_hashes: Sequence[str], cancel_cost):
+        """
+        Cancels a transaction from the queue, indexed by `tx_hashes`.
+        Assumes a fixed cancel cost
+        """
+        for tx_hash in tx_hashes:
+            tx = self.txs[tx_hash]
+            tx.gas_used = 0
+            tx.gas_premium = tx.gas_premium + cancel_cost
+            self.txs[tx_hash] = tx
+
     def average_tip(self, params): # in Gwei
         if self.pool_length == 0:
             return 0
