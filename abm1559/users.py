@@ -2,9 +2,10 @@ from typing import Dict
 
 import pandas as pd
 
+from abm1559.config import rng
+
 from abm1559.utils import (
     get_basefee_bounds,
-    rng
 )
 
 from abm1559.txs import (
@@ -75,7 +76,7 @@ class AffineUser(User):
     Affine users incur a fixed cost per unit of time.
     """
 
-    def __init__(self, wakeup_block):
+    def __init__(self, wakeup_block):        
         super().__init__(wakeup_block)
         self.cost_per_unit = int(rng.uniform(low = 0, high = 1) * (10 ** 9))
 
@@ -209,6 +210,9 @@ class UserFloatingEsc(AffineUser):
             return None
 
         return tx
+    
+    def decide_parameters(self, params):
+        assert False, "This method needs to be overridden"
 
     def cancel(self, tx, params):
         if "cancel_cost" in params:

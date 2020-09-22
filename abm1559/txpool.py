@@ -1,9 +1,10 @@
 from typing import Sequence
 
+from abm1559.config import rng
+
 from abm1559.txs import Transaction
 
 from abm1559.utils import (
-    rng,
     constants,
 )
 
@@ -62,7 +63,7 @@ class TxPool:
         else:
             return sum([tx.gas_price(params) for tx in self.txs.values()]) / self.pool_length / (10 ** 9)
 
-    def select_transactions(self, params):
+    def select_transactions(self, params, user_pool = None):
         # Miner side
         max_tx_in_block = int(constants["MAX_GAS_EIP1559"] / constants["SIMPLE_TRANSACTION_GAS"])
 
@@ -80,7 +81,7 @@ class TxPool:
     def average_value(self, user_pool):
         avg = 0.0
         for tx in self.txs.values():
-            sender = user_pool.users[tx.sender]
+            sender = user_pool.get_user(tx.sender)
             avg += sender.value / self.pool_length
         return avg
 
