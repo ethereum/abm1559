@@ -54,7 +54,7 @@ class TxPool:
         for tx_hash in tx_hashes:
             tx = self.txs[tx_hash]
             tx.gas_used = 0
-            tx.tip = tx.tip + cancel_cost
+            tx.gas_premium = tx.gas_premium + cancel_cost
             self.txs[tx_hash] = tx
 
     def average_tip(self, params): # in Gwei
