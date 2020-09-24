@@ -56,9 +56,6 @@ class User:
             self.tx_hash = tx.tx_hash
         return tx
 
-    def cancel(self, tx):
-        return False
-
     def export(self):
         return {
             "user": self,
@@ -155,13 +152,6 @@ class User1559(AffineUser):
             params = tx_params,
         )
         return tx
-
-    def cancel(self, tx, params):
-        if "cancel_cost" in params:
-            cancel_cost = params["cancel_cost"]
-        else:
-            cancel_cost = 0
-        return self.current_value(params) - cancel_cost < 0
 
     def export(self):
         return {
