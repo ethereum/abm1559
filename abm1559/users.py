@@ -4,11 +4,15 @@ import pandas as pd
 
 from abm1559.utils import (
     get_basefee_bounds,
-    rng
+    rng,
+    constants
 )
 
-from abm1559.txs import Tx1559
 
+from abm1559.txs import (
+    Tx1559,
+    TxLegacy
+)
 class User:
     """
     Users submit transactions. They have a (randomly chosen) value per Gwei :math:`v`, (we choose per Gwei such that all evaluations of their welfare can be done independently of how much gas the transaction uses).
@@ -171,3 +175,61 @@ class User1559(AffineUser):
 
     def __str__(self):
         return f"1559 affine user with value {self.value} and cost {self.cost_per_unit}"
+
+
+class LegacyUser(AffineUser):
+    """
+    An affine user sending Legacy transactions.
+    """
+    # Expects to be included within 5 blocks
+    # Prefers not to participate if its expected payoff is negative
+    # Fixed gas_premium
+
+    def expected_time(self, params):
+        return 5
+
+    def decide_parameters(self, params):
+        gas_price = 1 * (10 ** 9)
+        # max_gas = self.value 
+        gas_limit = constants["SIMPLE_TRANSACTION_GAS"]
+        return {
+            "gas_limit": gas_limit, # in wei
+            "gas_used": gas_limit, # in wei
+            "gas_price": gas_price, # in wei
+            "start_block": self.wakeup_block,
+        }
+
+    def create_transaction(self, params: dict):
+        tx_params = self.decide_parameters(params)
+
+        expected_gas_price = tx_params["gas_price"] * tx_params["gas_used"]
+        expected_block = self.wakeup_block + self.expected_time(params = {})
+        expected_payoff = self.payoff({
+            "gas_price": expected_gas_price,
+            "current_block": expected_block,
+        })
+
+        if expected_payoff < 0:
+            return None
+
+        tx = TxLegacy(
+            sender = self.pub_key,
+            params = tx_params,
+        )
+        return tx
+
+    def cancel(self, tx, params):
+        if "cancel_cost" in params:
+            cancel_cost = params["cancel_cost"]
+        else:
+            cancel_cost = 0
+        return self.current_value(params) - cancel_cost < 0
+
+    def export(self):
+        return {
+            **super().export(),
+            "user_type": "user_legacy",
+        }
+
+    def __str__(self):
+        return f"Legacy affine user with value {self.value} and cost {self.cost_per_unit}"
