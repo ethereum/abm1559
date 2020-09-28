@@ -89,17 +89,6 @@ def simulate(demand_scenario, shares_scenario):
             "cancel_cost": 2 * (10 ** 9), # in wei/gas
         }
         
-        #########
-        ## ADDED
-        ##
-        # We ask whether current users want to cancel their transactions waiting in the pool
-        cancelled_txs = user_pool.cancel_transactions(txpool, params)        
-        ##
-        # Cancel transactions in the pool, adds new empty transactions with higher fee
-        txpool.cancel_txs(cancelled_txs, params["cancel_cost"])
-        ##
-        #########
-        
         # We return some demand which on expectation yields 2000 new users per round
         users = spawn_poisson_heterogeneous_demand(t, demand_scenario[t], shares_scenario[t])
         
