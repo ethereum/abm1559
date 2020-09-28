@@ -29,12 +29,19 @@ class User:
     - (Requested) `transact(params)`: Queried by the simulation when user is spawned. Returns either a transaction or `None` if they balk.
     """
 
-    def __init__(self, wakeup_block):
-        self.pub_key = rng.bytes(8)
+    def __init__(self, wakeup_block, pub_key=None, value=None):
         self.wakeup_block = wakeup_block
-
+        
+        if pub_key is None:
+            self.pub_key = rng.bytes(8)
+        else:
+            self.pub_key = pub_key
+        
         # Users have a value (in wei) per unit of gas for the transaction
-        self.value = int(rng.uniform(low = 0, high = 20) * (10 ** 9))
+        if value is None:
+            self.value = int(rng.uniform(low = 0, high = 20) * (10 ** 9))
+        else:
+            self.value = value
 
     def cost(self, params):
         """
@@ -76,9 +83,13 @@ class AffineUser(User):
     Affine users incur a fixed cost per unit of time.
     """
 
-    def __init__(self, wakeup_block):        
-        super().__init__(wakeup_block)
-        self.cost_per_unit = int(rng.uniform(low = 0, high = 1) * (10 ** 9))
+    def __init__(self, wakeup_block, pub_key=None, value=None, cost_per_unit=None):        
+        super().__init__(wakeup_block, pub_key=pub_key, value=value)
+        
+        if cost_per_unit is None:
+            self.cost_per_unit = int(rng.uniform(low = 0, high = 1) * (10 ** 9))
+        else:
+            self.cost_per_unit = cost_per_unit
 
     def __str__(self):
         return f"Affine User with value {self.value} and cost {self.cost_per_unit}"
@@ -100,9 +111,13 @@ class DiscountUser(User):
     The value of discount users is reduced over time.
     """
 
-    def __init__(self, wakeup_block):
-        super().__init__(wakeup_block)
-        self.discount_rate = 0.01
+    def __init__(self, wakeup_block, pub_key=None, value=None, discount_rate=None):        
+        super().__init__(wakeup_block, pub_key=pub_key, value=value)
+        
+        if discount_rate is None:
+            self.discount_rate = 0.01
+        else:
+            self.discount_rate = discount_rate
 
     def __str__(self):
         return f"Discount User with value {self.value} and discount rate {self.discount_rate}"

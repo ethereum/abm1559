@@ -9,11 +9,17 @@ class Transaction:
     An abstract superclass for transactions.
     """
 
-    def __init__(self, sender, params, gas_used = constants["SIMPLE_TRANSACTION_GAS"]):
+    def __init__(self, sender, params,
+                 gas_used=constants["SIMPLE_TRANSACTION_GAS"],
+                 tx_hash=None):
         self.sender = sender
         self.start_block = params["start_block"]
         self.gas_used = gas_used
-        self.tx_hash = rng.bytes(8)
+        
+        if tx_hash is None:
+            self.tx_hash = rng.bytes(8)
+        else:
+            self.tx_hash = tx_hash
 
     def tx_data(self):
         return {
@@ -29,8 +35,10 @@ class Tx1559(Transaction):
     Inherits from :py:class:`abm1559.txs.Transaction`. A 1559-type transaction.
     """
 
-    def __init__(self, sender, params, gas_used = constants["SIMPLE_TRANSACTION_GAS"]):
-        super().__init__(sender, params, gas_used = gas_used)
+    def __init__(self, sender, params,
+                 gas_used=constants["SIMPLE_TRANSACTION_GAS"],
+                 tx_hash=None):
+        super().__init__(sender, params, gas_used=gas_used, tx_hash=tx_hash)
 
         self.gas_premium = params["gas_premium"]
         self.max_fee = params["max_fee"]
@@ -65,8 +73,10 @@ class TxEscalator(Transaction):
     Inherits from :py:class:`abm1559.txs.Transaction`. An escalator-type transaction.
     """
 
-    def __init__(self, sender, params, gas_used = constants["SIMPLE_TRANSACTION_GAS"]):
-        super().__init__(sender, params, gas_used = gas_used)
+    def __init__(self, sender, params,
+                 gas_used=constants["SIMPLE_TRANSACTION_GAS"],
+                 tx_hash=None):
+        super().__init__(sender, params, gas_used=gas_used, tx_hash=tx_hash)
 
         self.max_block = params["max_block"]
         self.start_premium = params["start_premium"]
@@ -96,8 +106,10 @@ class TxFloatingEsc(Transaction):
     Inherits from :py:class:`abm1559.txs.Transaction`. A floating escalator-type transaction.
     """
     
-    def __init__(self, sender, params, gas_used = constants["SIMPLE_TRANSACTION_GAS"]):
-        super().__init__(sender, params, gas_used = gas_used)
+    def __init__(self, sender, params,
+                 gas_used=constants["SIMPLE_TRANSACTION_GAS"],
+                 tx_hash=None):
+        super().__init__(sender, params, gas_used=gas_used, tx_hash=tx_hash)
 
         self.max_block = params["max_block"]
         self.start_premium = params["start_premium"]
