@@ -131,7 +131,6 @@ def simulate(demand_scenario, shares_scenario):
             "legacy": len([user for user in users if type(user) is LegacyUser]),
             "decided_txs": len(decided_txs),
             "included_txs": len(selected_txs),
-            "cancelled_txs": len(cancelled_txs),
             "blk_min_premium": block.min_premium() / (10 ** 9), # to Gwei
             "pool_length": txpool.pool_length,
             "pool_strat_users": pool_strat_users,
