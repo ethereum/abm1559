@@ -1,6 +1,6 @@
 from typing import Sequence
 
-from abm1559.txs import Transaction
+from abm1559.txs import Transaction, TxLegacy, normalize_legacy
 
 from abm1559.utils import (
     rng,
@@ -28,6 +28,8 @@ class TxPool:
         """
 
         for tx in txs:
+            if(type(tx) is TxLegacy):
+                tx = normalize_legacy(tx)
             self.txs[tx.tx_hash] = tx
         self.pool_length += len(txs)
 
