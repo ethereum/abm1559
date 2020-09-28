@@ -14,7 +14,7 @@ class Transaction:
         self.gas_used = gas_used
         self.tx_hash = rng.bytes(8)
 
-    def tx_data(self):
+    def tx_data(self, params):
         return {
             "tx": self,
             "start_block": self.start_block,
@@ -105,7 +105,7 @@ class TxLegacy(Transaction):
 
     def tx_data(self, params):
         return {
-            **super().tx_data(),
+            **super().tx_data(params),
             "gas_limit": self.gas_limit / (10 ** 9),
             "gas_price": self.gas_price / (10 ** 9),
         }
@@ -115,7 +115,7 @@ def normalize_legacy(legacy: TxLegacy) -> Tx1559:
     Normalized according to
     https://github.com/ethereum/EIPs/blob/541c8be92fe759aa602b7d06a088ab1a139e37ce/EIPS/eip-1559.md
     """
-    tx_data = legacy.tx_data()
+    tx_data = legacy.tx_data(params={})
     normalized_params = {
         "gas_limit": tx_data["gas_limit"],
         "max_fee": tx_data["gas_price"],
