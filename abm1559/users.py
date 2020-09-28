@@ -189,7 +189,7 @@ class LegacyUser(AffineUser):
         return 5
 
     def decide_parameters(self, params):
-        gas_price = 1 * (10 ** 9)
+        gas_price = 5 * (10 ** 9)
         # max_gas = self.value 
         gas_limit = constants["SIMPLE_TRANSACTION_GAS"]
         return {
@@ -202,12 +202,13 @@ class LegacyUser(AffineUser):
     def create_transaction(self, params: dict):
         tx_params = self.decide_parameters(params)
 
-        expected_gas_price = tx_params["gas_price"] * tx_params["gas_used"]
+        expected_gas_price = tx_params["gas_price"] * tx_params["gas_used"] / 10e18
         expected_block = self.wakeup_block + self.expected_time(params = {})
         expected_payoff = self.payoff({
             "gas_price": expected_gas_price,
             "current_block": expected_block,
         })
+        print(expected_payoff)
 
         if expected_payoff < 0:
             return None
