@@ -189,8 +189,7 @@ class LegacyUser(AffineUser):
         return 5
 
     def decide_parameters(self, params):
-        gas_price = 5 * (10 ** 9)
-        # max_gas = self.value 
+        gas_price = self.value - self.expected_time(params) * self.cost_per_unit
         gas_limit = constants["SIMPLE_TRANSACTION_GAS"]
         return {
             "gas_limit": gas_limit, # in wei
@@ -202,13 +201,20 @@ class LegacyUser(AffineUser):
     def create_transaction(self, params: dict):
         tx_params = self.decide_parameters(params)
 
-        expected_gas_price = tx_params["gas_price"] * tx_params["gas_used"] / 10e18
-        expected_block = self.wakeup_block + self.expected_time(params = {})
+        expected_waiting_time = self.expected_time(params = {})
+        basefee_lower_bound = get_basefee_bounds(params["basefee"], expected_waiting_time)["lb"]
+        expected_gas_price = tx_params["gas_price"]
+
+        # If user doesn't expect basefee to come down enough in the best case,
+        # don't transact
+        if basefee_lower_bound > expected_gas_price:
+            return None
+
+        expected_block = self.wakeup_block + expected_waiting_time
         expected_payoff = self.payoff({
             "gas_price": expected_gas_price,
             "current_block": expected_block,
         })
-        print(expected_payoff)
 
         if expected_payoff < 0:
             return None

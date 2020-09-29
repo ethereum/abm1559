@@ -2,6 +2,8 @@ import os, sys
 sys.path.insert(1, os.path.realpath(os.path.pardir))
 # You may remove the two lines above if you have installed abm1559 from pypi
 
+from typing import Sequence
+
 from abm1559.utils import constants
 
 from abm1559.txpool import TxPool
@@ -10,6 +12,8 @@ from abm1559.users import (
     User1559,
     LegacyUser
 )
+
+from abm1559.txs import Transaction, TxLegacy, normalize_legacy
 
 from abm1559.userpool import UserPool
 
@@ -30,11 +34,10 @@ class OptimisticUser(User1559):
     def expected_time(self, params):
         return 1
 
-
 class StrategicUser(User1559):
     """
     A strategic affine user sending 1559 transactions.
-    
+
     - Expects to be included in the next block
     - Prefers not to participate if its expected payoff is negative
     - Strategic gas_premium
@@ -69,10 +72,17 @@ class StrategicUser(User1559):
     def __str__(self):
         return f"1559 strategic affine user with value {self.value} and cost {self.cost_per_unit}"
 
+class MixedPool(TxPool):
+    def add_txs(self, txs: Sequence[Transaction]) -> None:
+        for tx in txs:
+            if type(tx) is TxLegacy:
+                tx = normalize_legacy(tx)
+            self.txs[tx.tx_hash] = tx
+        self.pool_length += len(txs)
 
 def simulate(demand_scenario, shares_scenario):
     # Instantiate a couple of things
-    txpool = TxPool()
+    txpool = MixedPool()
     basefee = constants["INITIAL_BASEFEE"]
     chain = Chain()
     metrics = []
@@ -80,18 +90,17 @@ def simulate(demand_scenario, shares_scenario):
     min_premium = 1 * (10 ** 9)
 
     for t in range(len(demand_scenario)):
-        
+
         # `params` are the "environment" of the simulation
         params = {
             "basefee": basefee,
             "current_block": t,
             "min_premium": min_premium,
-            "cancel_cost": 2 * (10 ** 9), # in wei/gas
         }
-        
+
         # We return some demand which on expectation yields 2000 new users per round
         users = spawn_poisson_heterogeneous_demand(t, demand_scenario[t], shares_scenario[t])
-        
+
         # Add new users to the pool
         # We query each new user with the current basefee value
         # Users either return a transaction or None if they prefer to balk
@@ -109,7 +118,7 @@ def simulate(demand_scenario, shares_scenario):
 
         # Record the min premium in the block
         min_premium = block.min_premium()
-        
+
         # The block is added to the chain
         chain.add_block(block)
 
@@ -144,11 +153,10 @@ def simulate(demand_scenario, shares_scenario):
 
     return (pd.DataFrame(metrics), user_pool, chain)
 
-
-blocks = 20
+blocks = 50
 demand_scenario = [2500 for i in range(blocks)]
 
-# strategic_share = 0.5 
+# strategic_share = 0.5
 shares_scenario = [{
     # StrategicUser: 0.25,
     # OptimisticUser: 0.25,
@@ -157,9 +165,11 @@ shares_scenario = [{
 
 (df, user_pool, chain) = simulate(demand_scenario, shares_scenario)
 
+print(df.head())
+print(df.tail())
 
-df.plot("block", ["pool_length", "pool_legacy_users", "pool_strat_users", "pool_nonstrat_users"])
-
+df.plot("block", ["basefee"])
+# df.plot("block", ["pool_length", "pool_legacy_users", "pool_strat_users", "pool_nonstrat_users"])
 
 import matplotlib.pyplot as plt
 plt.show()

@@ -15,6 +15,6 @@ rng = np.random.default_rng()
 
 def get_basefee_bounds(basefee, blocks):
     # We want to know how high/low the basefee can be after `blocks` steps, starting from `basefee`
-    lb = basefee * (1 - 1.0 / constants["BASEFEE_MAX_CHANGE_DENOMINATOR"])
-    ub = basefee * (1 + 1.0 / constants["BASEFEE_MAX_CHANGE_DENOMINATOR"])
+    lb = basefee * ((1 - 1.0 / constants["BASEFEE_MAX_CHANGE_DENOMINATOR"]) ** blocks)
+    ub = basefee * ((1 + 1.0 / constants["BASEFEE_MAX_CHANGE_DENOMINATOR"]) ** blocks)
     return { "lb": lb, "ub": ub }
