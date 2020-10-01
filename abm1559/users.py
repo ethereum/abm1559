@@ -172,17 +172,10 @@ class User1559(AffineUser):
             "current_block": expected_block,
         })
 
-        if expected_payoff < 0:
+        if expected_payoff <= 0:
             return None
 
         return tx
-
-    def cancel(self, tx, params):
-        if "cancel_cost" in params:
-            cancel_cost = params["cancel_cost"]
-        else:
-            cancel_cost = 0
-        return self.current_value(params) - cancel_cost < 0
 
     def export(self):
         return {
@@ -221,20 +214,13 @@ class UserFloatingEsc(AffineUser):
             "current_block": expected_block,
         })
 
-        if expected_payoff < 0 or tx_params["max_fee"] < 0:
+        if expected_payoff <= 0:
             return None
 
         return tx
 
     def decide_parameters(self, params):
         assert False, "This method needs to be overridden"
-
-    def cancel(self, tx, params):
-        if "cancel_cost" in params:
-            cancel_cost = params["cancel_cost"]
-        else:
-            cancel_cost = 0
-        return self.current_value(params) - cancel_cost < 0
 
     def export(self):
         return {
