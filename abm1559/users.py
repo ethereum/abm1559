@@ -31,12 +31,12 @@ class User:
 
     def __init__(self, wakeup_block, pub_key=None, value=None):
         self.wakeup_block = wakeup_block
-        
+
         if pub_key is None:
             self.pub_key = rng.bytes(8)
         else:
             self.pub_key = pub_key
-        
+
         # Users have a value (in wei) per unit of gas for the transaction
         if value is None:
             self.value = int(rng.uniform(low = 0, high = 20) * (10 ** 9))
@@ -83,9 +83,9 @@ class AffineUser(User):
     Affine users incur a fixed cost per unit of time.
     """
 
-    def __init__(self, wakeup_block, pub_key=None, value=None, cost_per_unit=None):        
+    def __init__(self, wakeup_block, pub_key=None, value=None, cost_per_unit=None):
         super().__init__(wakeup_block, pub_key=pub_key, value=value)
-        
+
         if cost_per_unit is None:
             self.cost_per_unit = int(rng.uniform(low = 0, high = 1) * (10 ** 9))
         else:
@@ -111,9 +111,9 @@ class DiscountUser(User):
     The value of discount users is reduced over time.
     """
 
-    def __init__(self, wakeup_block, pub_key=None, value=None, discount_rate=None):        
+    def __init__(self, wakeup_block, pub_key=None, value=None, discount_rate=None):
         super().__init__(wakeup_block, pub_key=pub_key, value=value)
-        
+
         if discount_rate is None:
             self.discount_rate = 0.01
         else:
@@ -156,12 +156,12 @@ class User1559(AffineUser):
 
     def create_transaction(self, params):
         tx_params = self.decide_parameters(params)
-        
+
         tx = Tx1559(
             sender = self.pub_key,
             params = tx_params,
         )
-    
+
         expected_block = self.wakeup_block + self.expected_time(params)
         expected_gas_price = tx.gas_price({
             **params,
@@ -172,7 +172,7 @@ class User1559(AffineUser):
             "current_block": expected_block,
         })
 
-        if expected_payoff < 0 or tx_params["max_fee"] < 0:
+        if expected_payoff < 0:
             return None
 
         return tx
@@ -197,20 +197,20 @@ class UserFloatingEsc(AffineUser):
     """
     An affine user sending floating escalator transactions.
     """
-    # Expects to be included within 5 blocks
+    # Expects to be included in the next block
     # Prefers not to participate if its expected payoff is negative
 
     def expected_time(self, params):
-        return 1
+        return 0
 
     def create_transaction(self, params):
         tx_params = self.decide_parameters(params)
-        
+
         tx = TxFloatingEsc(
             sender = self.pub_key,
             params = tx_params,
         )
-        
+
         expected_block = self.wakeup_block + self.expected_time(params)
         expected_gas_price = tx.gas_price({
             **params,
@@ -225,7 +225,7 @@ class UserFloatingEsc(AffineUser):
             return None
 
         return tx
-    
+
     def decide_parameters(self, params):
         assert False, "This method needs to be overridden"
 

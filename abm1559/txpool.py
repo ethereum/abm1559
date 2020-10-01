@@ -47,6 +47,16 @@ class TxPool:
             del(self.txs[tx_hash])
         self.pool_length -= len(tx_hashes)
         
+    def empty_pool(self):
+        """
+        Removes all transactions from the queue.
+        
+        Returns:
+            None
+        """
+        self.txs = {}
+        self.pool_length = 0
+        
     def remove_invalid_txs(self, params):
         invalid_txs = [tx_hash for tx_hash, tx in self.txs.items() if not tx.is_valid(params)]
         self.remove_txs(invalid_txs)
