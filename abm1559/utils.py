@@ -18,3 +18,5 @@ def get_basefee_bounds(basefee, blocks):
     lb = basefee * ((1 - 1.0 / constants["BASEFEE_MAX_CHANGE_DENOMINATOR"]) ** blocks)
     ub = basefee * ((1 + 1.0 / constants["BASEFEE_MAX_CHANGE_DENOMINATOR"]) ** blocks)
     return { "lb": lb, "ub": ub }
+
+flatten = lambda l: [item for sublist in l for item in sublist]
