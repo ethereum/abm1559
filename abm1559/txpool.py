@@ -46,6 +46,10 @@ class TxPool:
             del(self.txs[tx_hash])
         self.pool_length -= len(tx_hashes)
 
+    def remove_txs_from_sender(self, sender: str):
+        tx_hashes = [tx.tx_hash for tx in self.txs.values()]
+        self.remove_txs(tx_hashes)
+
     def cancel_txs(self, tx_hashes: Sequence[str], cancel_cost):
         """
         Cancels a transaction from the queue, indexed by `tx_hashes`.
