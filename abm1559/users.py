@@ -144,7 +144,7 @@ class User1559(AffineUser):
             "current_block": expected_block,
         })
 
-        if expected_payoff < 0 or tx_params["max_fee"] < 0:
+        if expected_payoff <= 0:
             return None
 
         tx = Tx1559(
