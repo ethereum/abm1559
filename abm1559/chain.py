@@ -8,7 +8,7 @@ class Block:
     An abstract block representation.
     """
 
-    def __init__(self, txs, parent_hash, height):
+    def __init__(self, txs, parent_hash, height, rng=rng):
         self.block_hash = rng.bytes(8)
         self.txs = txs
         self.parent_hash = parent_hash
@@ -25,8 +25,8 @@ class Block1559(Block):
     Blocks filled up with 1559 transactions (see :py:class:`abm1559.txs.Tx1559`) or 1559-like transactions (e.g., floating escalator transactions :py:class:`abm1559.txs.TxFloatingEsc`).
     """
 
-    def __init__(self, txs, parent_hash, height, basefee):
-        super().__init__(txs, parent_hash, height)
+    def __init__(self, txs, parent_hash, height, basefee, **kwargs):
+        super().__init__(txs, parent_hash, height, **kwargs)
         self.basefee = basefee
 
     def average_tip(self): # in Gwei

@@ -73,7 +73,7 @@ class TxPool:
         else:
             return sum([tx.gas_price(params) for tx in self.txs.values()]) / self.pool_length / (10 ** 9)
 
-    def select_transactions(self, params, user_pool = None):
+    def select_transactions(self, params, user_pool=None, rng=rng):
         # Miner side
         max_tx_in_block = int(constants["MAX_GAS_EIP1559"] / constants["SIMPLE_TRANSACTION_GAS"])
 

@@ -9,7 +9,7 @@ from abm1559.utils import (
 from abm1559.chain import Block
 from abm1559.users import User, User1559
 
-def spawn_poisson_demand(timestep: int, demand_lambda: float, UserClass) -> Sequence[User]:
+def spawn_poisson_demand(timestep: int, demand_lambda: float, UserClass, rng=rng) -> Sequence[User]:
     """
     One-step demand from homogeneous users, with demand size drawn from a Poisson distribution.
 
@@ -22,12 +22,11 @@ def spawn_poisson_demand(timestep: int, demand_lambda: float, UserClass) -> Sequ
         Sequence[User]: An array of users
     """
     
-    global rng
     demand_size = rng.poisson(demand_lambda)
-    new_users = [UserClass(timestep) for i in range(demand_size)]
+    new_users = [UserClass(timestep, rng=rng) for i in range(demand_size)]
     return new_users
 
-def spawn_poisson_heterogeneous_demand(timestep: int, demand_lambda: float, shares: Dict[type, float]) -> Sequence[User]:
+def spawn_poisson_heterogeneous_demand(timestep: int, demand_lambda: float, shares: Dict[type, float], rng=rng) -> Sequence[User]:
     """
     One-step demand from heterogeneous users, with demand size drawn from a Poisson distribution.
 
@@ -44,7 +43,7 @@ def spawn_poisson_heterogeneous_demand(timestep: int, demand_lambda: float, shar
     demand_size = rng.poisson(demand_lambda)
     sizes = shares_to_sizes(shares, demand_size)
     for UserClass, size in sizes.items():
-        new_users += [UserClass(timestep) for i in range(size)]
+        new_users += [UserClass(timestep, rng=rng) for i in range(size)]
     return new_users
 
 def shares_to_sizes(shares: Dict[type, float], demand_size: int) -> Dict[type, int]:
