@@ -12,6 +12,7 @@ jupyterlab = "*"
 matplotlib = "*"
 pandas = "*"
 cadcad = "*"
+tdqm = "*"
 
 [requires]
 python_version = "3.8"
