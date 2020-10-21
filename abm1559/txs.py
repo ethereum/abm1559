@@ -9,9 +9,7 @@ class Transaction:
     An abstract superclass for transactions.
     """
 
-    def __init__(self, sender, params,
-                 gas_used=constants["SIMPLE_TRANSACTION_GAS"],
-                 tx_hash=None):
+    def __init__(self, sender, params, gas_used=constants["SIMPLE_TRANSACTION_GAS"], tx_hash=None, rng=rng):
         self.sender = sender
         self.start_block = params["start_block"]
         self.gas_used = gas_used
@@ -35,10 +33,8 @@ class Tx1559(Transaction):
     Inherits from :py:class:`abm1559.txs.Transaction`. A 1559-type transaction.
     """
 
-    def __init__(self, sender, params,
-                 gas_used=constants["SIMPLE_TRANSACTION_GAS"],
-                 tx_hash=None):
-        super().__init__(sender, params, gas_used=gas_used, tx_hash=tx_hash)
+    def __init__(self, sender, params, **kwargs):
+        super().__init__(sender, params, **kwargs)
 
         self.gas_premium = params["gas_premium"]
         self.max_fee = params["max_fee"]
@@ -73,10 +69,8 @@ class TxEscalator(Transaction):
     Inherits from :py:class:`abm1559.txs.Transaction`. An escalator-type transaction.
     """
 
-    def __init__(self, sender, params,
-                 gas_used=constants["SIMPLE_TRANSACTION_GAS"],
-                 tx_hash=None):
-        super().__init__(sender, params, gas_used=gas_used, tx_hash=tx_hash)
+    def __init__(self, sender, params, **kwargs):
+        super().__init__(sender, params, **kwargs)
 
         self.max_block = params["max_block"]
         self.start_premium = params["start_premium"]
@@ -106,10 +100,8 @@ class TxFloatingEsc(Transaction):
     Inherits from :py:class:`abm1559.txs.Transaction`. A floating escalator-type transaction.
     """
     
-    def __init__(self, sender, params,
-                 gas_used=constants["SIMPLE_TRANSACTION_GAS"],
-                 tx_hash=None):
-        super().__init__(sender, params, gas_used=gas_used, tx_hash=tx_hash)
+    def __init__(self, sender, params, **kwargs):
+        super().__init__(sender, params, **kwargs)
 
         self.max_block = params["max_block"]
         self.start_premium = params["start_premium"]

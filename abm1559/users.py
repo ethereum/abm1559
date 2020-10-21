@@ -24,13 +24,14 @@ class User:
 
     `AffineUser` or `DiscountUser` are subclassed to create users who send different types of transactions, e.g., 1559-type transactions, escalators or something different. The subclasses should implement:
 
-    - (Optional) `expected_time(params)`: How the user estimates how long they will wait for their transaction to be included.
-    - (Optional) `decide_parameters(params)`: Based on their type and `params` (typically, current basefee, length of the queue or salient statistics e.g., distribution of tips in the queue), return transaction parameters.
-    - (Requested) `transact(params)`: Queried by the simulation when user is spawned. Returns either a transaction or `None` if they balk.
+    - (Optional) `expected_time(env)`: How the user estimates how long they will wait for their transaction to be included.
+    - (Optional) `decide_parameters(env)`: Based on their type and `env` (typically, current basefee, length of the queue or salient statistics e.g., distribution of tips in the queue), return transaction parameters.
+    - (Requested) `transact(env)`: Queried by the simulation when user is spawned. Returns either a transaction or `None` if they balk.
     """
 
-    def __init__(self, wakeup_block, pub_key=None, value=None):
+    def __init__(self, wakeup_block, pub_key=None, value=None, rng=rng):
         self.wakeup_block = wakeup_block
+        self.rng = rng
 
         if pub_key is None:
             self.pub_key = rng.bytes(8)
@@ -59,8 +60,8 @@ class User:
         gas_price = params["gas_price"]
         return self.current_value(params) - gas_price
 
-    def transact(self, params):
-        tx = self.create_transaction(params)
+    def transact(self, env):
+        tx = self.create_transaction(env)
         if tx is None:
             self.tx_hash = None
         else:
@@ -83,10 +84,11 @@ class AffineUser(User):
     Affine users incur a fixed cost per unit of time.
     """
 
-    def __init__(self, wakeup_block, pub_key=None, value=None, cost_per_unit=None):
-        super().__init__(wakeup_block, pub_key=pub_key, value=value)
+    def __init__(self, wakeup_block, cost_per_unit=None, **kwargs):
+        super().__init__(wakeup_block, **kwargs)
 
         if cost_per_unit is None:
+            rng = kwargs["rng"]
             self.cost_per_unit = int(rng.uniform(low = 0, high = 1) * (10 ** 9))
         else:
             self.cost_per_unit = cost_per_unit
@@ -94,8 +96,8 @@ class AffineUser(User):
     def __str__(self):
         return f"Affine User with value {self.value} and cost {self.cost_per_unit}"
 
-    def current_value(self, params):
-        current_block = params["current_block"]
+    def current_value(self, env):
+        current_block = env["current_block"]
         elapsed_time = current_block - self.wakeup_block
         return self.value - self.cost_per_unit * elapsed_time
 
@@ -111,8 +113,8 @@ class DiscountUser(User):
     The value of discount users is reduced over time.
     """
 
-    def __init__(self, wakeup_block, pub_key=None, value=None, discount_rate=None):
-        super().__init__(wakeup_block, pub_key=pub_key, value=value)
+    def __init__(self, wakeup_block, discount_rate=None, **kwargs):
+        super().__init__(wakeup_block, **kwargs)
 
         if discount_rate is None:
             self.discount_rate = 0.01
@@ -122,8 +124,8 @@ class DiscountUser(User):
     def __str__(self):
         return f"Discount User with value {self.value} and discount rate {self.discount_rate}"
 
-    def current_value(self, params):
-        current_block = params["current_block"]
+    def current_value(self, env):
+        current_block = env["current_block"]
         elapsed_time = current_block - self.wakeup_block
         return self.value * (1 - self.discount_rate) ** elapsed_time
 
@@ -142,10 +144,10 @@ class User1559(AffineUser):
     # Prefers not to participate if its expected payoff is negative
     # Fixed gas_premium
 
-    def expected_time(self, params):
+    def expected_time(self, env):
         return 5
 
-    def decide_parameters(self, params):
+    def decide_parameters(self, env):
         gas_premium = 1 * (10 ** 9)
         max_fee = self.value
         return {
@@ -154,17 +156,17 @@ class User1559(AffineUser):
             "start_block": self.wakeup_block,
         }
 
-    def create_transaction(self, params):
-        tx_params = self.decide_parameters(params)
+    def create_transaction(self, env):
+        tx_params = self.decide_parameters(env)
 
         tx = Tx1559(
             sender = self.pub_key,
             params = tx_params,
         )
 
-        expected_block = self.wakeup_block + self.expected_time(params)
+        expected_block = self.wakeup_block + self.expected_time(env)
         expected_gas_price = tx.gas_price({
-            **params,
+            **env,
             "current_block": expected_block
         })
         expected_payoff = self.payoff({
@@ -193,20 +195,21 @@ class UserFloatingEsc(AffineUser):
     # Expects to be included in the next block
     # Prefers not to participate if its expected payoff is negative
 
-    def expected_time(self, params):
+    def expected_time(self, env):
         return 0
 
-    def create_transaction(self, params):
-        tx_params = self.decide_parameters(params)
+    def create_transaction(self, env):
+        tx_params = self.decide_parameters(env)
 
         tx = TxFloatingEsc(
             sender = self.pub_key,
             params = tx_params,
+            rng = self.rng,
         )
 
-        expected_block = self.wakeup_block + self.expected_time(params)
+        expected_block = self.wakeup_block + self.expected_time(env)
         expected_gas_price = tx.gas_price({
-            **params,
+            **env,
             "current_block": expected_block,
         })
         expected_payoff = self.payoff({
@@ -219,7 +222,7 @@ class UserFloatingEsc(AffineUser):
 
         return tx
 
-    def decide_parameters(self, params):
+    def decide_parameters(self, env):
         assert False, "This method needs to be overridden"
 
     def export(self):
