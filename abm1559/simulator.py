@@ -9,7 +9,7 @@ from abm1559.chain import Block
 from abm1559.users import User, User1559
 
 def spawn_users(timestep: int, demand_size: int, UserClass) -> Sequence[User]:
-    return [UserClass(timestep) for i in range(demand_size)]
+    return [UserClass(wakeup_block=timestep) for i in range(demand_size)]
 
 def spawn_poisson_demand(timestep: int, demand_lambda: float, UserClass) -> Sequence[User]:
     """
