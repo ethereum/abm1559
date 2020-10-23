@@ -10,13 +10,13 @@ class UserPool:
     def __init__(self):
         self.users = {}
 
-    def decide_transactions(self, users: Sequence[User], params: Dict) -> Sequence[Transaction]:
+    def decide_transactions(self, users: Sequence[User], env: Dict) -> Sequence[Transaction]:
         """
         Adds and queries all new users, to check who wants to send transactions and who wants to balk.
 
         Args:
             users (Sequence[User]): Sequence of new users
-            params (Dict): Current simulation environment parameters (e.g., basefee)
+            env (Dict): Current simulation environment parameters (e.g., basefee)
 
         Returns:
             Sequence[Transaction]: An array of transactions
@@ -25,14 +25,14 @@ class UserPool:
         txs = []
         for user in users:
             self.users[user.pub_key] = user
-            tx = user.transact(params)
+            tx = user.transact(env)
             if not tx is None:
                 txs.append(tx)
 
         return txs
 
     def get_user(self, pub_key):
-        return self.users[user.pub_key]
+        return self.users[pub_key]
 
     def cancel_transactions(self, txpool, params):
         """
@@ -47,7 +47,7 @@ class UserPool:
 
         cancelled_txs = []
         for tx in txpool.txs.values():
-            user = self.users[tx.sender]
+            user = get_user(tx.sender)
             cancel = user.cancel(tx, params)
             if cancel:
                 cancelled_txs += [tx.tx_hash]
