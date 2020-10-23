@@ -11,8 +11,6 @@ constants = {
     "SIMPLE_TRANSACTION_GAS": 21000,
 }
 
-rng = np.random.default_rng()
-
 def get_basefee_bounds(basefee, blocks):
     # We want to know how high/low the basefee can be after `blocks` steps, starting from `basefee`
     lb = basefee * (1 - 1.0 / constants["BASEFEE_MAX_CHANGE_DENOMINATOR"])

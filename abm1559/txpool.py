@@ -1,9 +1,10 @@
 from typing import Sequence
 
+from abm1559.config import rng
+
 from abm1559.txs import Transaction
 
 from abm1559.utils import (
-    rng,
     constants,
 )
 
@@ -45,6 +46,20 @@ class TxPool:
         for tx_hash in tx_hashes:
             del(self.txs[tx_hash])
         self.pool_length -= len(tx_hashes)
+        
+    def empty_pool(self):
+        """
+        Removes all transactions from the queue.
+        
+        Returns:
+            None
+        """
+        self.txs = {}
+        self.pool_length = 0
+        
+    def remove_invalid_txs(self, params):
+        invalid_txs = [tx_hash for tx_hash, tx in self.txs.items() if not tx.is_valid(params)]
+        self.remove_txs(invalid_txs)
 
     def cancel_txs(self, tx_hashes: Sequence[str], cancel_cost):
         """
@@ -69,17 +84,16 @@ class TxPool:
         else:
             return sum([tx.gas_price(params) for tx in self.txs.values()]) / self.pool_length / (10 ** 9)
 
-    def select_transactions(self, params):
+    def select_transactions(self, params, user_pool=None, rng=rng):
         # Miner side
-        basefee = params["basefee"]
         max_tx_in_block = int(constants["MAX_GAS_EIP1559"] / constants["SIMPLE_TRANSACTION_GAS"])
 
-        valid_txs = [tx for tx in self.txs.values() if tx.is_valid({ "basefee": basefee })]
+        valid_txs = [tx for tx in self.txs.values() if tx.is_valid(params)]
         rng.shuffle(valid_txs)
 
         sorted_valid_demand = sorted(
             valid_txs,
-            key = lambda tx: -tx.tip({ "basefee": basefee })
+            key = lambda tx: -tx.tip(params)
         )
         selected_txs = sorted_valid_demand[0:max_tx_in_block]
 
@@ -88,7 +102,7 @@ class TxPool:
     def average_value(self, user_pool):
         avg = 0.0
         for tx in self.txs.values():
-            sender = user_pool.users[tx.sender]
+            sender = user_pool.get_user(tx.sender)
             avg += sender.value / self.pool_length
         return avg
 
