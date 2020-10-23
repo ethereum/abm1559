@@ -61,6 +61,17 @@ class TxPool:
         invalid_txs = [tx_hash for tx_hash, tx in self.txs.items() if not tx.is_valid(params)]
         self.remove_txs(invalid_txs)
 
+    def cancel_txs(self, tx_hashes: Sequence[str], cancel_cost):
+        """
+        Cancels a transaction from the queue, indexed by `tx_hashes`.
+        Assumes a fixed cancel cost
+        """
+        for tx_hash in tx_hashes:
+            tx = self.txs[tx_hash]
+            tx.gas_used = 0
+            tx.gas_premium = tx.gas_premium + cancel_cost
+            self.txs[tx_hash] = tx
+
     def average_tip(self, params): # in Gwei
         if self.pool_length == 0:
             return 0
