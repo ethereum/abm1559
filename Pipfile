@@ -13,6 +13,7 @@ matplotlib = "*"
 pandas = "*"
 cadcad = "*"
 seaborn = "*"
+tdqm = "*"
 
 [requires]
 python_version = "3.8"
