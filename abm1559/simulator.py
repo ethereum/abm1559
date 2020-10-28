@@ -1,4 +1,5 @@
 from typing import Sequence, Dict
+import numpy as np
 
 from abm1559.config import rng
 
@@ -70,3 +71,15 @@ def update_basefee(block: Block, basefee: int) -> int:
     gas_used = sum([tx.gas_used for tx in block.txs])
     delta = gas_used - constants["TARGET_GAS_USED"]
     return basefee + basefee * delta // constants["TARGET_GAS_USED"] // constants["BASEFEE_MAX_CHANGE_DENOMINATOR"]
+
+def generate_seeds(seeds=100):
+    return rng.integers(low=0, high=seeds*1000, size=seeds)
+
+def generate_gbm(lambda_0, T, paths = 1, mu = 0.5, sigma = 1, rng=rng):
+    t = np.repeat(np.array([np.arange(1, T+1)]), paths, axis = 0)
+    b = rng.normal(size=[paths, T])
+    w = b.cumsum(axis = 1)
+    drift = (mu - 0.5 * sigma**2) * t
+    diffusion = sigma * w
+    S = lambda_0 * np.exp(drift + diffusion)
+    return S
