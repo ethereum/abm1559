@@ -27,3 +27,7 @@ A good benchmark case to test fee market proposals is stationary demand. In this
 ### [Strategic users in EIP 1559](https://github.com/barnabemonnot/abm1559/blob/master/notebooks/strategicUser.ipynb)
 
 Before reaching stationarity, or when demand varies rapidly, the market endures transitionary periods where either too many users or too few decide to transact. When there are too few, the basefee naturally decreases. But when there are too many, users have an incentive to increase their premiums during this transitionary period, until sufficiently many users are discouraged by the basefee level, at which point being strategic is no longer helpful. We investigate this dynamics and briefly compare the efficiency in both strategic and non-strategic cases.
+
+### [The floating escalator: Combining 1559 and the escalator](https://github.com/barnabemonnot/abm1559/blob/master/notebooks/floatingEscalator.ipynb)
+
+As shown by the previous notebook, strategic users in 1559 sometimes have the incentive to enter tip auctions when demand increases rapidly. The escalator is a proposal to automate in protocol the "transaction resubmission" pattern where a strategic user increases their bid over time until inclusion. Combined with 1559 to obtain a good default starting bid, the escalator could help users with various time preferences optimise their resubmission during demand shifts. In this introductory notebook, we present the behaviour of various user strategies and discuss their efficiency.
