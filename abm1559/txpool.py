@@ -56,10 +56,6 @@ class TxPool:
         """
         self.txs = {}
         self.pool_length = 0
-        
-    def remove_invalid_txs(self, params):
-        invalid_txs = [tx_hash for tx_hash, tx in self.txs.items() if not tx.is_valid(params)]
-        self.remove_txs(invalid_txs)
 
     def cancel_txs(self, tx_hashes: Sequence[str], cancel_cost):
         """
