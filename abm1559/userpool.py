@@ -47,8 +47,9 @@ class UserPool:
 
         cancelled_txs = []
         for tx in txpool.txs.values():
-            user = get_user(tx.sender)
-            cancel = user.cancel(tx, params)
+            user = self.get_user(tx.sender)
+            #cancel = user.cancel(tx, params)
+            cancel = user.cancel(tx)
             if cancel:
                 cancelled_txs += [tx.tx_hash]
         return cancelled_txs
