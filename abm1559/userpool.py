@@ -34,7 +34,7 @@ class UserPool:
     def get_user(self, pub_key):
         return self.users[pub_key]
 
-    def cancel_transactions(self, txpool, params):
+    def cancel_transactions(self, txpool, env):
         """
         Queries all users and checks who wants to cancel their transactions waiting in the pool.
 
@@ -48,7 +48,7 @@ class UserPool:
         cancelled_txs = []
         for tx in txpool.txs.values():
             user = get_user(tx.sender)
-            cancel = user.cancel(tx, params)
+            cancel = user.cancel(tx, env)
             if cancel:
                 cancelled_txs += [tx.tx_hash]
         return cancelled_txs
