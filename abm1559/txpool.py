@@ -68,28 +68,28 @@ class TxPool:
             tx.gas_premium = tx.gas_premium + cancel_cost
             self.txs[tx_hash] = tx
 
-    def average_tip(self, params): # in Gwei
+    def average_tip(self, env): # in Gwei
         if self.pool_length == 0:
             return 0
         else:
-            return sum([tx.tip(params) for tx in self.txs.values()]) / self.pool_length / (10 ** 9)
+            return sum([tx.tip(env) for tx in self.txs.values()]) / self.pool_length / (10 ** 9)
 
-    def average_gas_price(self, params):
+    def average_gas_price(self, env):
         if self.pool_length == 0:
             return 0
         else:
-            return sum([tx.gas_price(params) for tx in self.txs.values()]) / self.pool_length / (10 ** 9)
+            return sum([tx.gas_price(env) for tx in self.txs.values()]) / self.pool_length / (10 ** 9)
 
-    def select_transactions(self, params, user_pool=None, rng=rng):
+    def select_transactions(self, env, user_pool=None, rng=rng):
         # Miner side
         max_tx_in_block = int(constants["MAX_GAS_EIP1559"] / constants["SIMPLE_TRANSACTION_GAS"])
 
-        valid_txs = [tx for tx in self.txs.values() if tx.is_valid(params)]
+        valid_txs = [tx for tx in self.txs.values() if tx.is_valid(env)]
         rng.shuffle(valid_txs)
 
         sorted_valid_demand = sorted(
             valid_txs,
-            key = lambda tx: -tx.tip(params)
+            key = lambda tx: -tx.tip(env)
         )
         selected_txs = sorted_valid_demand[0:max_tx_in_block]
 

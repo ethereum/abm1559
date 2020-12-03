@@ -29,7 +29,7 @@ class User:
     - (Requested) `transact(env)`: Queried by the simulation when user is spawned. Returns either a transaction or `None` if they balk.
     """
 
-    def __init__(self, wakeup_block, pub_key=None, value=None, rng=rng):
+    def __init__(self, wakeup_block, pub_key=None, value=None, rng=rng, **kwargs):
         self.wakeup_block = wakeup_block
         self.rng = rng
 
@@ -44,21 +44,21 @@ class User:
         else:
             self.value = value
 
-    def cost(self, params):
+    def cost(self, env):
         """
         Args:
-            params (Dict): Includes `gas_price` in wei
+            env (Dict): Includes `gas_price` in wei
         """
-        gas_price = params["gas_price"]
-        return self.value - self.current_value(params) + gas_price
+        gas_price = env["gas_price"]
+        return self.value - self.current_value(env) + gas_price
 
-    def payoff(self, params):
+    def payoff(self, env):
         """
         Args:
-            params (Dict): Includes `gas_price` in wei
+            env (Dict): Includes `gas_price` in wei
         """
-        gas_price = params["gas_price"]
-        return self.current_value(params) - gas_price
+        gas_price = env["gas_price"]
+        return self.current_value(env) - gas_price
 
     def transact(self, env):
         tx = self.create_transaction(env)
@@ -84,14 +84,14 @@ class AffineUser(User):
     Affine users incur a fixed cost per unit of time.
     """
 
-    def __init__(self, wakeup_block, cost_per_unit=None, **kwargs):
+    def __init__(self, wakeup_block, **kwargs):
         super().__init__(wakeup_block, **kwargs)
 
-        if cost_per_unit is None:
+        if not "cost_per_unit" in kwargs:
             rng = kwargs["rng"]
             self.cost_per_unit = int(rng.uniform(low = 0, high = 1) * (10 ** 9))
         else:
-            self.cost_per_unit = cost_per_unit
+            self.cost_per_unit = kwargs["cost_per_unit"]
 
     def __str__(self):
         return f"Affine User with value {self.value} and cost {self.cost_per_unit}"
@@ -113,13 +113,13 @@ class DiscountUser(User):
     The value of discount users is reduced over time.
     """
 
-    def __init__(self, wakeup_block, discount_rate=None, **kwargs):
+    def __init__(self, wakeup_block, **kwargs):
         super().__init__(wakeup_block, **kwargs)
 
-        if discount_rate is None:
+        if not "discount_rate" in kwargs:
             self.discount_rate = 0.01
         else:
-            self.discount_rate = discount_rate
+            self.discount_rate = kwargs["discount_rate"]
 
     def __str__(self):
         return f"Discount User with value {self.value} and discount rate {self.discount_rate}"
@@ -161,7 +161,7 @@ class User1559(AffineUser):
 
         tx = Tx1559(
             sender = self.pub_key,
-            params = tx_params,
+            tx_params = tx_params,
         )
 
         expected_block = self.wakeup_block + self.expected_time(env)
@@ -203,7 +203,7 @@ class UserFloatingEsc(AffineUser):
 
         tx = TxFloatingEsc(
             sender = self.pub_key,
-            params = tx_params,
+            tx_params = tx_params,
             rng = self.rng,
         )
 
