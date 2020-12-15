@@ -41,8 +41,17 @@ class Block1559(Block):
             "current_block": self.height,
         }) for tx in self.txs]) / len(self.txs) / (10 ** 9)
 
-    def min_premium(self): # in wei
+    def min_premium(self) -> int: # in wei
         return 0 if len(self.txs) == 0 else min([tx.gas_premium for tx in self.txs])
+    
+    def max_premium(self) -> int: # in wei
+        return 0 if len(self.txs) == 0 else max([tx.gas_premium for tx in self.txs])
+    
+    def min_tip(self, env) -> int:
+        return 0 if len(self.txs) == 0 else min([tx.tip(env) for tx in self.txs])
+    
+    def max_tip(self, env) -> int:
+        return 0 if len(self.txs) == 0 else max([tx.tip(env) for tx in self.txs])
 
     def txs_data(self):
         txs_data = []
