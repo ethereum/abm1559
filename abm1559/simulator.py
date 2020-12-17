@@ -69,8 +69,17 @@ def update_basefee(block: Block, basefee: int) -> int:
     """
 
     gas_used = sum([tx.gas_used for tx in block.txs])
-    delta = gas_used - constants["TARGET_GAS_USED"]
-    return basefee + basefee * delta // constants["TARGET_GAS_USED"] // constants["BASEFEE_MAX_CHANGE_DENOMINATOR"]
+    if gas_used == constants["TARGET_GAS_USED"]:
+        new_basefee = basefee
+    elif gas_used > constants["TARGET_GAS_USED"]:
+        gas_delta = gas_used - constants["TARGET_GAS_USED"]
+        fee_delta = max(basefee * gas_delta // constants["TARGET_GAS_USED"] // constants["BASEFEE_MAX_CHANGE_DENOMINATOR"], 1)
+        new_basefee = basefee + fee_delta
+    else:
+        gas_delta = constants["TARGET_GAS_USED"] - gas_used
+        fee_delta = basefee * gas_delta // constants["TARGET_GAS_USED"] // constants["BASEFEE_MAX_CHANGE_DENOMINATOR"]
+        new_basefee = basefee - fee_delta
+    return new_basefee
 
 def generate_seeds(seeds=100):
     return rng.integers(low=0, high=seeds*1000, size=seeds)

@@ -8,7 +8,7 @@ constants = {
     "EIP1559_GAS_INCREMENT_AMOUNT": 10,
     "INITIAL_BASEFEE": 1 * (10 ** 9),
     "PER_TX_GASLIMIT": 8000000,
-    "SIMPLE_TRANSACTION_GAS": 210000,
+    "SIMPLE_TRANSACTION_GAS": 21000,
 }
 
 def get_basefee_bounds(basefee, blocks):
