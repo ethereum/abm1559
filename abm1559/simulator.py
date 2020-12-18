@@ -10,7 +10,7 @@ from abm1559.utils import (
 from abm1559.chain import Block
 from abm1559.users import User, User1559
 
-def spawn_poisson_demand(timestep: int, demand_lambda: float, UserClass, rng=rng) -> Sequence[User]:
+def spawn_poisson_demand(timestep: int, demand_lambda: float, UserClass, rng: np.random.Generator = rng) -> Sequence[User]:
     """
     One-step demand from homogeneous users, with demand size drawn from a Poisson distribution.
 
@@ -27,7 +27,7 @@ def spawn_poisson_demand(timestep: int, demand_lambda: float, UserClass, rng=rng
     new_users = [UserClass(timestep, rng=rng) for i in range(demand_size)]
     return new_users
 
-def spawn_poisson_heterogeneous_demand(timestep: int, demand_lambda: float, shares: Dict[type, float], rng=rng) -> Sequence[User]:
+def spawn_poisson_heterogeneous_demand(timestep: int, demand_lambda: float, shares: Dict[type, float], rng: np.random.Generator = rng) -> Sequence[User]:
     """
     One-step demand from heterogeneous users, with demand size drawn from a Poisson distribution.
 
@@ -81,10 +81,10 @@ def update_basefee(block: Block, basefee: int) -> int:
         new_basefee = basefee - fee_delta
     return new_basefee
 
-def generate_seeds(seeds=100):
+def generate_seeds(seeds: int = 100, rng: np.random.Generator = rng):
     return rng.integers(low=0, high=seeds*1000, size=seeds)
 
-def generate_gbm(lambda_0, T, paths = 1, mu = 0.5, sigma = 1, rng=rng):
+def generate_gbm(lambda_0: float, T: int, paths: int = 1, mu: float = 0.5, sigma: float = 1, rng: np.random.Generator = rng):
     t = np.repeat(np.array([np.arange(1, T+1)]), paths, axis = 0)
     b = rng.normal(size=[paths, T])
     w = b.cumsum(axis = 1)
