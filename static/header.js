@@ -13,7 +13,7 @@ class Header extends React.Component {
           ),
           e(
             'div', { className: "header-left-element" },
-            e('a', { href: '/abm1559/notebooks' }, "eip1559 notebooks")
+            e('a', { href: '/abm1559' }, "eip1559 notebooks")
           ),
           e(
             'div', { className: "header-right-elements" },
