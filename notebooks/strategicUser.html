@@ -3,12 +3,12 @@
 <head><meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>strategicUser</title><script src="static/underscore.min.js"></script>
-  <script src="static/react.development.js"></script>
-  <script src="static/react-dom.development.js"></script>
-  <script src="static/component-library.js"></script>
-  <script src="static/header.js"></script>
-  <script src="static/footer.js"></script>
+<title>strategicUser</title><script src="../static/underscore.min.js"></script>
+  <script src="../static/react.development.js"></script>
+  <script src="../static/react-dom.development.js"></script>
+  <script src="../static/component-library.js"></script>
+  <script src="../static/header.js"></script>
+  <script src="../static/footer.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 
 
@@ -14262,7 +14262,7 @@ a.anchor-link {
     init_mathjax();
     </script>
     <!-- End of mathjax configuration -->
-  <link rel="stylesheet" type="text/css" href="static/index.css"/>
+  <link rel="stylesheet" type="text/css" href="../static/index.css"/>
 </head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 
@@ -14277,46 +14277,11 @@ a.anchor-link {
     <div class="document-container">
       <div class="title-container">
         <div class="title">
-          # Strategic users in EIP 1559
-
-###### September 2020, [@barnabemonnot](https://twitter.com/barnabemonnot)
-###### [Robust Incentives Group](https://github.com/ethereum/rig), Ethereum Foundation
-
----
-
-In our [previous notebook](https://github.com/barnabemonnot/abm1559/blob/master/notebooks/stationary1559.ipynb), we simulated users interacting with the EIP 1559 transaction fee market mechanism for inclusion. Our users were strategic to some extent: they observed the prevailing basefee, evaluated their values and costs and decided whether to send a transaction or not. We saw that once the system reaches stationarity, users who aren't deterred by the basefee can expect next-block inclusion.
-
-We made one big assumption there, which is that users respect the commonly stated heuristic of setting their premiums (in general, what the miner receives from the transaction) at a fixed value compensating the miner for the extra work of including one extra transaction. In this notebook, we relax this assumption and look at what happens when users bid strategically, trying to outcompete each other in transitionary periods, before the basefee settles.
-
-Firstly, let's load up a few classes from our [`abm1559`](https://github.com/barnabemonnot/abm1559) library.
+          Strategic users in EIP 1559
         </div>
 
         <div class="sub-title">
-          import os, sys
-sys.path.insert(1, os.path.realpath(os.path.pardir))
-# You may remove the two lines above if you have installed abm1559 from pypi
-
-from abm1559.utils import constants
-
-from abm1559.txpool import TxPool
-
-from abm1559.users import User1559
-
-from abm1559.userpool import UserPool
-
-from abm1559.chain import (
-    Chain,
-    Block1559,
-)
-
-from abm1559.simulator import (
-    spawn_poisson_heterogeneous_demand,
-    update_basefee,
-)
-
-import pandas as pd
-import numpy as np
-from tqdm import tqdm
+          
         </div>
       </div>
 
@@ -14326,7 +14291,6 @@ from tqdm import tqdm
       </div>
       
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="Strategic-users-in-EIP-1559">Strategic users in EIP 1559<a class="anchor-link" href="#Strategic-users-in-EIP-1559">&#182;</a></h1><h6 id="September-2020,-@barnabemonnot">September 2020, <a href="https://twitter.com/barnabemonnot">@barnabemonnot</a><a class="anchor-link" href="#September-2020,-@barnabemonnot">&#182;</a></h6><h6 id="Robust-Incentives-Group,-Ethereum-Foundation"><a href="https://github.com/ethereum/rig">Robust Incentives Group</a>, Ethereum Foundation<a class="anchor-link" href="#Robust-Incentives-Group,-Ethereum-Foundation">&#182;</a></h6><hr>
 <p>In our <a href="https://github.com/barnabemonnot/abm1559/blob/master/notebooks/stationary1559.ipynb">previous notebook</a>, we simulated users interacting with the EIP 1559 transaction fee market mechanism for inclusion. Our users were strategic to some extent: they observed the prevailing basefee, evaluated their values and costs and decided whether to send a transaction or not. We saw that once the system reaches stationarity, users who aren't deterred by the basefee can expect next-block inclusion.</p>
 <p>We made one big assumption there, which is that users respect the commonly stated heuristic of setting their premiums (in general, what the miner receives from the transaction) at a fixed value compensating the miner for the extra work of including one extra transaction. In this notebook, we relax this assumption and look at what happens when users bid strategically, trying to outcompete each other in transitionary periods, before the basefee settles.</p>
 <p>Firstly, let's load up a few classes from our <a href="https://github.com/barnabemonnot/abm1559"><code>abm1559</code></a> library.</p>
@@ -15751,23 +15715,17 @@ $$ \texttt{tip} = \min(\texttt{fee cap} - \texttt{basefee}, \texttt{gas premium}
 <p>In future notebooks, we'll investigate the efficiency properties of different fee market mechanisms.</p>
 
 </div>
-<div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<hr>
-<p><em>Acknowledgements</em>: Fred Lacs for comments and code.</p>
 
-</div>
+
+
+
     </div>
   </div>
   <script>
-  ## Introducing strategic users
+  // References + footnotes
 
-Our previous simulation only featured one type of users, `User1559`. Users received some random value (in Gwei, per gas unit) for transaction inclusion and costs (in Gwei, per gas and time unit) for waiting.
-
-For instance, Alice has 15 Gwei/gas value for inclusion, and cost 0.5 Gwei/gas/block. If Alice waits for 5 blocks to be included, her payoff for each gas unit she obtains is 15 - 5 * 0.5 = 12.5. To this, we subtract the fee Alice must pay for inclusion, or _gas price_. Assuming the basefee currently sits at 10 Gwei/gas and Alice set her premium at 1 Gwei/gas, her total gas price is 11 Gwei/gas. Her final payoff is then 12.5 - 11 = 1.5 Gwei/gas. In other words:
-
-$$ \texttt{payoff} = \texttt{value} - \texttt{cost from waiting} - \texttt{transaction fee} $$
-
-Users estimate their final payoff by estimating how long they will wait for inclusion. Our default `User1559` estimates a fixed waiting time of 5 blocks. Let's go ahead and change that to zero, as we have done with the `OptimisticUser` in the previous notebook. The `OptimisticUser` expects next block inclusion.
+// Authors
+let authorData = ["barnabe"];
   </script>
 
   
@@ -15778,18 +15736,58 @@ Users estimate their final payoff by estimating how long they will wait for incl
     ReactDOM.render(
       e(
         Footer, {
-          acknowledgements: 'class OptimisticUser(User1559):
-    def expected_time(self, env):
-        return 0',
+          acknowledgements: 'Many thanks to Fred Lacs for comments and code.',
         }
       ),
       document.querySelector("#footer")
     )
+
+    const copyToClipboard = str => {
+      const el = document.createElement("textarea") // Create a <textarea> element
+      el.value = str // Set its value to the string that you want copied
+      el.setAttribute("readonly", "") // Make it readonly to be tamper-proof
+      el.style.position = "absolute"
+      el.style.left = "-9999px" // Move outside the screen to make it invisible
+      document.body.appendChild(el) // Append the <textarea> element to the HTML document
+      const selected =
+        document.getSelection().rangeCount > 0 // Check if there is any content selected previously
+          ? document.getSelection().getRangeAt(0) // Store selection if found
+          : false // Mark as false to know no selection existed before
+      el.select() // Select the <textarea> content
+      document.execCommand("copy") // Copy - only works as a result of a user action (e.g. click events)
+      document.body.removeChild(el) // Remove the <textarea> element
+      if (selected) {
+        // If a selection existed before copying
+        document.getSelection().removeAllRanges() // Unselect everything on the HTML document
+        document.getSelection().addRange(selected) // Restore the original selection
+      }
+    }
+    function handleCopyClick(evt) {
+      // get the children of the parent element
+      const { children } = evt.target.parentElement
+      // grab the first element (we append the copy button on afterwards, so the first will be the code element)
+      // destructure the innerText from the code block
+      const { innerText } = Array.from(children)[0]
+      // copy all of the code to the clipboard
+      copyToClipboard(innerText)
+    }
+
+    const highlights = document.querySelectorAll(".jp-InputArea-editor .highlight")
+
+    highlights.forEach(div => {
+      // create the copy button
+      const copy = document.createElement("button")
+      copy.innerHTML = "Copy"
+      // add the event listener to each click
+      copy.addEventListener("click", handleCopyClick)
+      // append the copy button to each code block
+      div.append(copy)
+    })
     </script>
   </div>
-  <script src="static/authorFormatting.js"></script>
-  <script src="static/sectionFormatting.js"></script>
-  <script src="static/referencesFormatting.js"></script>
+  <script src="../static/authorFormatting.js"></script>
+  <script src="../static/sectionFormatting.js"></script>
+  <script src="../static/referencesFormatting.js"></script>
 
 
 
