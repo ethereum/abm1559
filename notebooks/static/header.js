@@ -9,7 +9,7 @@ class Header extends React.Component {
           "div", { className: "header-container" },
           e(
             'div', { className: "header-left-element" },
-            e('a', { href: '/' }, "Robust Incentives Group")
+            e('a', { href: 'https://github.com/ethereum/rig' }, "Robust Incentives Group")
           ),
           e(
             'div', { className: "header-right-elements" },
