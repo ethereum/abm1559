@@ -1,0 +1,5 @@
+numpy==1.19.4
+jupyterlab==3.0.5
+tqdm==4.56.0
+pandas==1.2.1
+matplotlib==3.3.3
