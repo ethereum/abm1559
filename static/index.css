@@ -477,6 +477,11 @@ table.data-table td {
   img {
     width: 100%;
   }
+
+  .document-container {
+    margin-right: 10px;
+    margin-left: 10px;
+  }
 }
 
 /* Fixed width list */
