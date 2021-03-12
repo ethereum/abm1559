@@ -14,9 +14,13 @@ class Header extends React.Component {
           e(
             'div', { className: "header-right-elements" },
             e(
-              'div', { className: "header-left-element" },
+              'div', { className: "header-right-element" },
               e('a', { href: '/abm1559' }, "eip1559")
             ),
+            e(
+              'div', { className: "header-right-element" },
+              e('a', { href: '/beaconrunner' }, "eth2")
+            )
             // e(
             //   'div', { className: "header-right-element" },
             //   e('a', { href: '/about' }, 'About')

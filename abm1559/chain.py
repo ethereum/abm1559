@@ -19,6 +19,9 @@ class Block:
 
     def average_waiting_time(self):
         return 0 if len(self.txs) == 0 else sum([self.height - tx.start_block for tx in self.txs]) / len(self.txs)
+    
+    def gas_used(self):
+        return 0 if len(self.txs) == 0 else sum([tx.gas_used for tx in self.txs])
 
 class Block1559(Block):
     """
@@ -28,6 +31,12 @@ class Block1559(Block):
     def __init__(self, txs, parent_hash, height, basefee, **kwargs):
         super().__init__(txs, parent_hash, height, **kwargs)
         self.basefee = basefee
+        
+    def tips(self):
+        return 0 if len(self.txs) == 0 else sum([tx.tip({
+            "basefee": self.basefee,
+            "current_block": self.height,
+        }) for tx in self.txs]) / (10 ** 9)
 
     def average_tip(self): # in Gwei
         return 0 if len(self.txs) == 0 else sum([tx.tip({
