@@ -15,7 +15,9 @@ class TxPool:
 
     def __init__(self):
         self.txs = {}
-        self.pool_length = 0
+        
+    def pool_length(self) -> int:
+        return len(self.txs)
 
     def add_txs(self, txs: Sequence[Transaction]) -> None:
         """
@@ -30,7 +32,6 @@ class TxPool:
 
         for tx in txs:
             self.txs[tx.tx_hash] = tx
-        self.pool_length += len(txs)
 
     def remove_txs(self, tx_hashes: Sequence[str]):
         """
@@ -45,7 +46,6 @@ class TxPool:
 
         for tx_hash in tx_hashes:
             del(self.txs[tx_hash])
-        self.pool_length -= len(tx_hashes)
         
     def empty_pool(self):
         """
@@ -55,7 +55,6 @@ class TxPool:
             None
         """
         self.txs = {}
-        self.pool_length = 0
 
     def cancel_txs(self, tx_hashes: Sequence[str], cancel_cost):
         """
@@ -72,13 +71,13 @@ class TxPool:
         if self.pool_length == 0:
             return 0
         else:
-            return sum([tx.tip(env) for tx in self.txs.values()]) / self.pool_length / (10 ** 9)
+            return sum([tx.tip(env) for tx in self.txs.values()]) / self.pool_length() / (10 ** 9)
 
     def average_gas_price(self, env):
         if self.pool_length == 0:
             return 0
         else:
-            return sum([tx.gas_price(env) for tx in self.txs.values()]) / self.pool_length / (10 ** 9)
+            return sum([tx.gas_price(env) for tx in self.txs.values()]) / self.pool_length() / (10 ** 9)
 
     def select_transactions(self, env, user_pool=None, rng=rng):
         # Miner side
@@ -99,7 +98,7 @@ class TxPool:
         avg = 0.0
         for tx in self.txs.values():
             sender = user_pool.get_user(tx.sender)
-            avg += sender.value / self.pool_length
+            avg += sender.value / self.pool_length()
         return avg
 
     def average_waiting_time(self, current_height):
