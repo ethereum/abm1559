@@ -10,24 +10,33 @@ class UserPool:
     def __init__(self):
         self.users = {}
 
-    def decide_transactions(self, users: Sequence[User], env: Dict) -> Sequence[Transaction]:
+    def decide_transactions(self, users: Sequence[User], env: Dict, query_all: bool = False) -> Sequence[Transaction]:
         """
         Adds and queries all new users, to check who wants to send transactions and who wants to balk.
 
         Args:
             users (Sequence[User]): Sequence of new users
             env (Dict): Current simulation environment parameters (e.g., basefee)
+            query_all (bool): Should all users in the pool be queried, or new incoming users only?
 
         Returns:
             Sequence[Transaction]: An array of transactions
         """
 
         txs = []
-        for user in users:
-            self.users[user.pub_key] = user
-            tx = user.transact(env)
-            if not tx is None:
-                txs.append(tx)
+        if not query_all:
+            for user in users:
+                self.users[user.pub_key] = user
+                tx = user.transact(env)
+                if not tx is None:
+                    txs.append(tx)
+        else:
+            for user in users:
+                self.users[user.pub_key] = user
+            for pub_key, user in self.users.items():
+                tx = user.transact(env)
+                if not tx is None:
+                    txs.append(tx)
 
         return txs
 
