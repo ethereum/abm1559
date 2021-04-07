@@ -17,9 +17,9 @@
 
 <style type="text/css">
     pre { line-height: 125%; }
-td.linenos pre { color: #000000; background-color: #f0f0f0; padding-left: 5px; padding-right: 5px; }
-span.linenos { color: #000000; background-color: #f0f0f0; padding-left: 5px; padding-right: 5px; }
-td.linenos pre.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
 span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
 .highlight .hll { background-color: var(--jp-cell-editor-active-background) }
 .highlight { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }
@@ -16292,15 +16292,13 @@ z
 
 <span class="k">class</span> <span class="nc">MixedTxPool</span><span class="p">(</span><span class="n">TxPool</span><span class="p">):</span>
     
-    <span class="k">def</span> <span class="nf">add_txs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txs</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Transaction</span><span class="p">],</span> <span class="n">env</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">add_txs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txs</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Transaction</span><span class="p">],</span> <span class="n">env</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Transaction</span><span class="p">]:</span>
         <span class="k">for</span> <span class="n">tx</span> <span class="ow">in</span> <span class="n">txs</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">tx</span><span class="p">)</span> <span class="ow">is</span> <span class="n">TxLegacy</span><span class="p">:</span>
                 <span class="n">tx</span> <span class="o">=</span> <span class="n">normalize_from_legacy</span><span class="p">(</span><span class="n">tx</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">txs</span><span class="p">[</span><span class="n">tx</span><span class="o">.</span><span class="n">tx_hash</span><span class="p">]</span> <span class="o">=</span> <span class="n">tx</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">pool_length</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">txs</span><span class="p">)</span>
-            
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool_length</span> <span class="o">&gt;</span> <span class="n">MAX_TRANSACTIONS_IN_POOL</span><span class="p">:</span>
+                    
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool_length</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">MAX_TRANSACTIONS_IN_POOL</span><span class="p">:</span>
             <span class="n">sorted_txs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">txs</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">tx</span><span class="p">:</span> <span class="o">-</span><span class="n">tx</span><span class="o">.</span><span class="n">tip</span><span class="p">(</span><span class="n">env</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">empty_pool</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_txs</span><span class="p">(</span><span class="n">sorted_txs</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">MAX_TRANSACTIONS_IN_POOL</span><span class="p">],</span> <span class="n">env</span><span class="p">)</span>
@@ -16308,7 +16306,7 @@ z
         
         <span class="k">return</span> <span class="p">[]</span>
     
-    <span class="k">def</span> <span class="nf">select_transactions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">user_pool</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">select_transactions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">user_pool</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Transaction</span><span class="p">]:</span>
         <span class="c1"># Miner side</span>
         <span class="n">max_tx_in_block</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">constants</span><span class="p">[</span><span class="s2">&quot;MAX_GAS_EIP1559&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">constants</span><span class="p">[</span><span class="s2">&quot;SIMPLE_TRANSACTION_GAS&quot;</span><span class="p">])</span>
 
