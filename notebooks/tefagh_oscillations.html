@@ -14291,8 +14291,8 @@ a.anchor-link {
       </div>
       
 <div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Reproducing <a href="https://mtefagh.github.io/fee/">Path-dependence problem with EIP-1559 and a possible solution to this problem</a> with different demand assumptions. Contrary to this work, we do not obtain the progressive basefee decrease. The potential reason is that in the path-dependence notebooks, 500 new transactions are spawned each round, drawing at random their premium and max fee. The gas used by each transaction is 25,000, while the block gas target is 12,500,000, i.e., there is just enough demand each round to fill the block to target. The</p>
-<ul>
+<p>Reproducing <a href="https://mtefagh.github.io/fee/">Path-dependence problem with EIP-1559 and a possible solution to this problem</a> with different demand assumptions: either the demand rate is equal to the supply rate, or the demand rate is higher. When both rates are equal, the multiplicative rule with patient users does make basefee tend to zero. However, small deviations from equality between demand and supply mean basefee will settle to its equilibrium level, as other users will always fill the gap. With an additive rule, basefee does not tend to zero when demand and supply rates are equal.</p>
+<h2 id="Assumptions">Assumptions<a class="anchor-link" href="#Assumptions">&#182;</a></h2><ul>
 <li>Block target = 12.5M gas, block limit = 25M gas</li>
 <li>All users send transactions of size 25000 gas, i.e., target = 500 txs, limit = 1000 txs.</li>
 <li>User values (in Gwei) drawn from Pareto distribution <code>2 + self.rng.pareto(2) * 20</code>. No cost per time unit.</li>
