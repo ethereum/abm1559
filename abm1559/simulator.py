@@ -34,7 +34,7 @@ def spawn_poisson_heterogeneous_demand(timestep: int, demand_lambda: float, shar
     Args:
         timestep (int): Current round
         demand_lambda (float): Rate of arrival, the :math:`lambda` parameter of a Poisson distribution
-        UserClass (Dict[type, float]): Keys are user classes (subclasses of :py:class:`abm1559.users.User`), values are the share of each user class to spawn this round. Shares are expected to sum to 1.
+        shares (Dict[type, float]): Keys are user classes (subclasses of :py:class:`abm1559.users.User`), values are the share of each user class to spawn this round. Shares are expected to sum to 1.
 
     Returns:
         Sequence[User]: An array of users
@@ -42,6 +42,26 @@ def spawn_poisson_heterogeneous_demand(timestep: int, demand_lambda: float, shar
 
     new_users = []
     demand_size = rng.poisson(demand_lambda)
+    sizes = shares_to_sizes(shares, demand_size)
+    for UserClass, size in sizes.items():
+        new_users += [UserClass(timestep, rng=rng) for i in range(size)]
+    return new_users
+
+def spawn_fixed_heterogeneous_demand(timestep: int, demand_lambda: float, shares: Dict[type, float], rng: np.random.Generator = rng) -> Sequence[User]:
+    """
+    One-step demand from heterogeneous users, with demand size fixed to `demand_lambda`.
+
+    Args:
+        timestep (int): Current round
+        demand_lambda (float): Rate of arrival
+        shares (Dict[type, float]): Keys are user classes (subclasses of :py:class:`abm1559.users.User`), values are the share of each user class to spawn this round. Shares are expected to sum to 1.
+
+    Returns:
+        Sequence[User]: An array of users
+    """
+    
+    new_users = []
+    demand_size = demand_lambda
     sizes = shares_to_sizes(shares, demand_size)
     for UserClass, size in sizes.items():
         new_users += [UserClass(timestep, rng=rng) for i in range(size)]
