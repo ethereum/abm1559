@@ -1,7 +1,9 @@
 import sys
+import math
 import pandas as pd
 
 from abm1559.config import rng
+from abm1559.utils import constants
 
 class Block:
     """
@@ -76,6 +78,23 @@ class Block1559(Block):
             }]
         return txs_data
 
+###
+# EIP as an AMM
+# https://ethresear.ch/t/make-eip-1559-more-like-an-amm-curve/9082
+###
+    
+def eth_qty(gas_qty):
+    return math.exp(gas_qty / constants["TARGET_GAS_USED"] / constants["BASEFEE_MAX_CHANGE_DENOMINATOR"])    
+
+class BlockAMMImplied(Block1559):
+    
+    def __init__(self, txs, parent_hash, height, excess_gas_issued, **kwargs):
+        super().__init__(txs, parent_hash, height, basefee = 0, **kwargs)
+        self.excess_gas_issued = excess_gas_issued
+        self.burn_fee = eth_qty(self.excess_gas_issued + self.gas_used())
+        self.burn_fee = self.burn_fee - eth_qty(self.excess_gas_issued)
+        self.basefee = self.burn_fee / self.gas_used() if self.gas_used() > 0 else 0
+    
 class Chain:
     """
     A container for :py:class:`abm1559.chain.Block` .
