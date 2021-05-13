@@ -104,6 +104,13 @@ def update_basefee(block: Block, basefee: int) -> int:
 def generate_seeds(seeds: int = 100, rng: np.random.Generator = rng):
     return rng.integers(low=0, high=seeds*1000, size=seeds)
 
+def generate_abm(lambda_0: float, T: int, paths: int = 1, mu: float = 0.5, sigma: float = 1, rng: np.random.Generator = rng):
+    t = np.repeat(np.array([np.arange(1, T+1)]), paths, axis = 0)
+    b = rng.normal(size=[paths, T])
+    w = b.cumsum(axis = 1)
+    S = lambda_0 + mu * t + sigma * w
+    return S
+
 def generate_gbm(lambda_0: float, T: int, paths: int = 1, mu: float = 0.5, sigma: float = 1, rng: np.random.Generator = rng):
     t = np.repeat(np.array([np.arange(1, T+1)]), paths, axis = 0)
     b = rng.normal(size=[paths, T])
@@ -126,3 +133,27 @@ def apply_block_time_variance(demand_process: Sequence[float], blocks: int, mean
         demand_per_block += [int(new_demand)]
         current_time += ia_time
     return demand_per_block
+
+def generate_poisson_process(l: float, duration: float, rng: np.random.Generator) -> Sequence[float]:
+    """
+    Generates a Poisson arrival process of rate `l` and duration `duration`.
+    """
+    t = 0
+    ia_times = []
+    while t < duration:
+        ia_time = rng.exponential(1.0 / l)
+        t += ia_time
+        ia_times += [t]
+        
+    return ia_times
+
+def generate_jump_process(pp: Sequence[float], duration: int, jump_mean: float, rng: np.random.Generator, discount: float = 0.0):
+    jp = []
+    current_jump = 0
+    for k in range(duration):
+        jumps = [int(t) for t in pp if int(t) == k]
+        for jump in jumps:
+            current_jump += rng.exponential(jump_mean)
+        jp += [current_jump]
+        current_jump *= (1-discount)
+    return np.array(jp)

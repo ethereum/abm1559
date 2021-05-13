@@ -5,13 +5,18 @@ Agent-based simulation environment for EIP 1559.
 You can simply run the following commands in a terminal. If you prefer, use a virtual environment to install packages in a local folder.
 
 ```shell
-git clone https://github.com/barnabemonnot/abm1559.git
+git clone https://github.com/ethereum/abm1559.git
 cd abm1559
 
 ###
 # Optional: use a virtual environment
-python3 -m venv env
+python -m venv env
+
+# Unix
 source env/bin/activate
+
+# Windows
+.\env\Scripts\activate
 ###
 
 pip install -r requirements.txt
