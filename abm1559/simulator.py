@@ -92,3 +92,17 @@ def generate_gbm(lambda_0: float, T: int, paths: int = 1, mu: float = 0.5, sigma
     diffusion = sigma * w
     S = lambda_0 * np.exp(drift + diffusion)
     return S
+
+def apply_block_time_variance(demand_process: Sequence[float], blocks: int, mean_ia_time: float = 13, rng: np.random.Generator = rng) -> Sequence[int]:
+    # Block time differences are distributed along a Poisson(13)
+    ia_times = rng.exponential(13, blocks)
+    demand_per_block = []
+    current_time = 0
+    for block_index, ia_time in enumerate(ia_times):
+        ia_time = int(ia_time)
+        new_demand = 0
+        for t in range(current_time, current_time + ia_time):
+            new_demand += demand_process[t]
+        demand_per_block += [int(new_demand)]
+        current_time += ia_time
+    return demand_per_block
