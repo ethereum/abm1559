@@ -9,6 +9,24 @@ class UserPool:
 
     def __init__(self):
         self.users = {}
+        
+    def add_users(self, users: Sequence[User]) -> None:
+        for user in users:
+            self.users[user.pub_key] = user
+    
+    def query_users(self, env: Dict, query_all: bool = False) -> Sequence[Transaction]:
+        if query_all:
+            users_to_query = self.users.values()
+        else:
+            users_to_query = [user for user in self.users.values() if user.wakeup_block == env["current_block"]]
+        
+        txs = []  
+        for user in users_to_query:
+            tx = user.transact(env)
+            if not tx is None:
+                txs.append(tx)
+        return txs
+            
 
     def decide_transactions(self, users: Sequence[User], env: Dict, query_all: bool = False) -> Sequence[Transaction]:
         """
@@ -42,25 +60,6 @@ class UserPool:
 
     def get_user(self, pub_key):
         return self.users[pub_key]
-
-    def cancel_transactions(self, txpool, env):
-        """
-        Queries all users and checks who wants to cancel their transactions waiting in the pool.
-
-        Args:
-            txpool (TxPool): Transaction pool
-
-        Returns:
-            Sequence[bytes]: An array of transaction hashes
-        """
-
-        cancelled_txs = []
-        for tx in txpool.txs.values():
-            user = get_user(tx.sender)
-            cancel = user.cancel(tx, env)
-            if cancel:
-                cancelled_txs += [tx.tx_hash]
-        return cancelled_txs
 
     def export(self):
         df = []
