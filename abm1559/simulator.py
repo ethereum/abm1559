@@ -10,7 +10,7 @@ from abm1559.utils import (
 from abm1559.chain import Block
 from abm1559.users import User, User1559
 
-def spawn_poisson_demand(timestep: int, demand_lambda: float, UserClass, rng: np.random.Generator = rng) -> Sequence[User]:
+def spawn_poisson_demand(timestep: int, demand_lambda: float, UserClass, rng: np.random.Generator = rng, **kwargs) -> Sequence[User]:
     """
     One-step demand from homogeneous users, with demand size drawn from a Poisson distribution.
 
@@ -24,7 +24,7 @@ def spawn_poisson_demand(timestep: int, demand_lambda: float, UserClass, rng: np
     """
     
     demand_size = rng.poisson(demand_lambda)
-    new_users = [UserClass(timestep, rng=rng) for i in range(demand_size)]
+    new_users = [UserClass(timestep, rng=rng, **kwargs) for i in range(demand_size)]
     return new_users
 
 def spawn_poisson_heterogeneous_demand(timestep: int, demand_lambda: float, shares: Dict[type, float], rng: np.random.Generator = rng) -> Sequence[User]:

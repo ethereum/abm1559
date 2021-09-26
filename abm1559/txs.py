@@ -40,7 +40,7 @@ class Tx1559(Transaction):
         self.max_fee = tx_params["max_fee"]
 
     def __str__(self):
-        return f"1559 Transaction {self.tx_hash.hex()}: max_fee {self.max_fee}, gas_premium {self.gas_premium}"
+        return f"1559 Transaction {self.tx_hash.hex()}: max_fee {self.max_fee}, gas_premium {self.gas_premium}, gas_used {self.gas_used}"
 
     def is_valid(self, env):
         basefee = env["basefee"]
