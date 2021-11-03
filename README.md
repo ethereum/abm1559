@@ -24,6 +24,12 @@ As shown by the previous notebook, strategic users in 1559 sometimes have the in
 
 1559 will be introduced by a soft transition out of the legacy behaviour, with legacy transactions cast into 1559 format by setting their parameters from the declared gas price. This notebook investigates first the behaviour of legacy users in an environment where price references are provided by distributional oracles. We observe the inefficiencies of the legacy, first-price auction-based systems: sticky prices leading to overpayment and "bubbles" driven by high-value users. Meanwhile the introduction of the basefee and basefee-following users (explored in previous notebooks) "cools" the market, reducing the gap between transaction fees and true market-clearing price.
 
+## Publications
+
+- Reijsbergen, D., Sridhar, S., Monnot, B., Leonardos, S., Skoulakis, S., & Piliouras, G. (2021). Transaction Fees on a Honeymoon: Ethereum's EIP-1559 One Month Later. _arXiv preprint arXiv:2110.04753_. [arXiv link](https://arxiv.org/abs/2110.04753)
+
+- Leonardos, S., Monnot, B., Reijsbergen, D., Skoulakis, S., & Piliouras, G. (2021). Dynamical Analysis of the EIP-1559 Ethereum Fee Market. _arXiv preprint arXiv:2102.10567_. [arXiv link](https://arxiv.org/abs/2102.10567)
+
 ## Running the notebooks
 
 You can simply run the following commands in a terminal. If you prefer, use a virtual environment to install packages in a local folder.
