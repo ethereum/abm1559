@@ -37,7 +37,7 @@ kiwisolver==1.3.1
 MarkupSafe==2.0.0
 matplotlib==3.4.2
 matplotlib-inline==0.1.2
-mistune==0.8.4
+mistune==2.0.3
 multiprocess==0.70.11.1
 nbclassic==0.2.8
 nbclient==0.5.3
